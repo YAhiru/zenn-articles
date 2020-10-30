@@ -116,6 +116,8 @@ User クラスのプロパティである `$screenName` や `$age` を見てみ�
 Typed Property が指定されていない場合 PHP Doc に記述された型以外が代入された場合でもエラーが発生せず、思わぬバグを引き起こす可能性を秘めています。
 あなたの所属するチーム内でこのことが問題視されたという設定で、Rector を使ってこのクラスを自動リファクタリングしてみましょう。
 
+## Rector を実行する
+
 Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} --set {{ルールセット}}` のように、 process コマンドに実行したいディレクトリや適用したい **ルールセット** や **ルール** を渡せば良いだけです。
 
 唐突にルールやルールセットという単語を使いましたが、
@@ -129,6 +131,8 @@ Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} -
 ```bash
 $ vendor/bin/rector process ../src --set php74 --only Rector\Php74\Rector\Property\TypedPropertyRector
 ```
+
+## 修正されたファイルを確認する
 
 コマンドを実行するとそれっぽさのある出力が表示されたかと思いますが、実際の User クラスを確認してみると以下のように `$screenName` と `$age` に Typed Property が適用されていることがわかります。
 
@@ -150,9 +154,10 @@ final class User
 
 **どうですか！！！！！！！！すごくないですか！？！？！？！？！？！？！？！？**（唐突な興奮）
 
+## その他のルールの紹介
+
 Rector には 600 個を超える様々なルールが用意されているので、使えそうなものがないか探してみてください。
 中には CakePHP の `App::uses()` を use 文に変えてくれるルールなどもあり、軽い感動を覚えます。
-
 
 - [ルールセットの一覧]()
 - [ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md)
