@@ -80,7 +80,7 @@ Rector は普通に `composer req --dev rector/rector` を実行して利用す�
 [Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **カスタムルールを作りたいなどのニーズがない場合** は phar あるいは docker 形式での利用をおすすめします。
 
 今回は最終的にカスタムルールを作りたいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題が予想されます。
-そういった場合に有効なのが Rector 用のサブディレクトリを作成し、その中で Rector 関連のコードを完結させることです。([アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!)
+そういった場合に有効なのが Rector 用のサブディレクトリを作成し、その中で Rector 関連のコードを完結させることです。^[[アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!]
 サンプルプロジェクトでもそのアプローチを採用しています。
 
 では、以下のコマンドで Rector のインストールをします。
