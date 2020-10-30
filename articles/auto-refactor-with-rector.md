@@ -31,7 +31,7 @@ published: false
 
 小規模なものであれば手作業でおこなっても問題のないことが多いですが、大規模になると**うっかりミスが発生しがち**だったり単純作業ゆえの**精神的な苦痛**が伴うこともあったりなど、あまり好ましくありません。
 
-これから紹介する Rector は、そういった**機械的な作業からエンジニアを開放する**とてもすごいツールです。
+これから紹介する [Rector](https://github.com/rectorphp/rector) は、そういった**機械的な作業からエンジニアを開放する**とてもすごいツールです。
 
 是非この記事で Rector の基本的な使い方を覚え、日々の業務を楽にしてみてください。
 
@@ -78,7 +78,7 @@ rector ディレクトリはこの記事の後半で実装するカスタムル�
 Rector は普通に `composer req --dev rector/rector` を実行して利用する他に [phar](https://github.com/rectorphp/rector-prefixed) や [docker](https://hub.docker.com/r/rector/rector) などの形式が用意されています。
 [Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **カスタムルールを作りたいなどのニーズがない場合** は phar あるいは docker 形式での利用をおすすめします。
 
-今回は最終的にカスタムルールを作りたいため rector/rector を composer 経由でダウンロードするわけですが、前述の通り**依存関係が多いため既存のプロダクトにインストールすることができない**といった問題が予想されます。
+今回は最終的にカスタムルールを作りたいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り**依存関係が多いため既存のプロダクトにインストールすることができない**といった問題が予想されます。
 そういった場合に有効なのが Rector 用のサブディレクトリを作成し、その中で Rector 関連のコードを完結させることです。([アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!)
 サンプルプロジェクトでもそのアプローチを採用しています。
 
