@@ -160,7 +160,7 @@ Rector を使ってリファクタリングを自動化することで工数を�
 
 今回使ったルールの他に、Rector には 600 個を超える様々なルールが用意されています。あなたのプロダクトで使えそうなルールがないか探してみてください。
 
-- [ルールセットの一覧]()
+- [ルールセットの一覧](https://github.com/rectorphp/rector/tree/master/config/set)
 - [ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md)
 
 # カスタムルールを作る
