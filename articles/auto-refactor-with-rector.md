@@ -71,16 +71,16 @@ $ composer i
 ここでいうアプリケーションコードとは Web アプリケーションであればコントローラーやエンティティなどに当たるもので、リファクタリングの対象となるコードです。
 今回は src ディレクトリに単純なクラスを 1 つだけ用意しています。
 
-rector ディレクトリはこの記事の後半で実装するカスタムルールのためのディレクトリとなっていますので、最低限の設定のみで残りはほぼ空の状態となっています。
+rector ディレクトリはこの記事の後半で実装するカスタムルールのためのディレクトリとなっていますので、最低限の設定のみでほぼ空の状態となっています。
 
 # インストール
 
-Rector は普通に `composer req --dev rector/rector` を実行して利用する他に [phar](https://github.com/rectorphp/rector-prefixed) や [docker](https://hub.docker.com/r/rector/rector) などの形式が用意されています。
+Rector は `composer req --dev rector/rector` を実行して利用する他に [phar](https://github.com/rectorphp/rector-prefixed) や [docker](https://hub.docker.com/r/rector/rector) などの形式が用意されています。
 [Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **カスタムルールを作りたいなどのニーズがない場合** は phar あるいは docker 形式での利用をおすすめします。
 
-今回は最終的にカスタムルールを作りたいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題が予想されます。
-そういった場合に有効なのが Rector 用のサブディレクトリを作成し、その中で Rector 関連のコードを完結させることです。([アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!)
-サンプルプロジェクトでもそのアプローチを採用しています。
+今回は最終的にカスタムルールを作りたいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題の発生が予想されます。
+そういった場合に有効なのが Rector 用のサブディレクトリを作成しその中で Rector 関連のコードを完結させることです。([アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!)
+今回のサンプルプロジェクトでもそのアプローチを採用しています。
 
 では、以下のコマンドで Rector のインストールをします。
 
@@ -134,7 +134,7 @@ $ vendor/bin/rector process ../src --set php74 --only Rector\Php74\Rector\Proper
 
 ## 修正されたファイルを確認する
 
-コマンドを実行するとそれっぽさのある出力が表示されたかと思いますが、実際の User クラスを確認してみると以下のように `$screenName` と `$age` に Typed Property が適用されていることがわかります。
+コマンドを実行するとそれっぽさのある出力がなされたかと思いますが、実際の User クラスを確認してみると以下のように `$screenName` と `$age` に Typed Property が適用されていることがわかります。
 
 ```php:src/User.php
 final class User
