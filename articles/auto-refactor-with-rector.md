@@ -75,8 +75,19 @@ rector ディレクトリはこの記事の後半で実装するカスタムル�
 
 # インストール
 
-- composer, docker, phar の 3 種類があることを紹介
-- サンプルプロジェクトのサブディレクトリに Rector を composer でインストールする
+Rector は普通に `composer req --dev rector/rector` を実行して利用する他に [phar](https://github.com/rectorphp/rector-prefixed) や [docker](https://hub.docker.com/r/rector/rector) などが用意されています。
+[Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、カスタムルールを作りたいなどのニーズがない場合は **phar** あるいは **docker** 形式での利用をおすすめします。
+
+今回は最終的にカスタムルールを作りたいため、 rector/rector を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため既存のプロダクトに入れることができないといった問題が予想されます。
+そういった場合に有効なのが Rector 用のサブディレクトリを作成し、その中で Rector 関連のコードを完結させることです。(@tadsan [アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます)
+この記事でもそのアプローチを取って進めていきます。
+
+では、以下のコマンドで Rector のインストールをします。
+
+```bash
+$ cd rector
+$ composer req rector/rector
+```
 
 # 予め用意されているルールを適用してみる
 
