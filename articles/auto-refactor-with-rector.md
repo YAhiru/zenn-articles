@@ -41,7 +41,7 @@ published: false
 
 ## 推奨環境
 
-- PHP >=7.3
+- PHP >=7.4
 
 ## git clone
 
