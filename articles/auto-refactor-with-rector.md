@@ -91,9 +91,71 @@ $ composer req rector/rector
 
 # 予め用意されているルールを適用してみる
 
-- 既存のクラスをタイプドプロパティにする。
-- オプションでルールを指定して実行
-- その他に使えるルールの探し方を紹介する
+それでは Rector を試していきたいと思います。
+今回自動リファクタリングをしてみるファイルは `src/User.php` です。
+
+```php:src/User.php
+final class User
+{
+    /** @var string */
+    private $screenName;
+    /** @var int */
+    private $age;
+
+    public function __construct(string $screenName, int $age)
+    {
+        $this->screenName = $screenName;
+        $this->age = $age;
+    }
+
+    // ...
+}
+```
+
+User クラスのプロパティである `$screenName` や `$age` を見てみると [Typed Property](https://wiki.php.net/rfc/typed_properties_v2) が適用されていないことがわかります。
+Typed Property が指定されていない場合 PHP Doc に記述された型以外が代入された場合でもエラーが発生せず、思わぬバグを引き起こす可能性を秘めています。
+あなたの所属するチーム内でこのことが問題視されたという設定で、Rector を使ってこのクラスを自動リファクタリングしてみましょう。
+
+Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} --set {{ルールセット}}` のように、 process コマンドに実行したいディレクトリや適用したい **ルールセット** や **ルール** を渡せば良いだけです。
+
+唐突にルールやルールセットという単語を使いましたが、
+ルールとはリファクタリングの内容が定義された PHP のクラスのことで、
+ルールセットとは関心ごとが近い複数のルールがまとめられたもののことです。
+
+今回は Typed Property だけを適用してくれればよいので、 **php74** というルールセットの中にある **Rector\Php74\Rector\Property\TypedPropertyRector** というルールのみを採用したいと思います。
+
+**rector ディレクトリ内で** 以下のコマンドを実行してみましょう。
+
+```bash
+$ vendor/bin/rector process ../src --set php74 --only Rector\Php74\Rector\Property\TypedPropertyRector
+```
+
+コマンドを実行するとそれっぽさのある出力が表示されたかと思いますが、実際の User クラスを確認してみると以下のように `$screenName` と `$age` に Typed Property が適用されていることがわかります。
+
+```php:src/User.php
+final class User
+{
+    private string $screenName;
+    private int $age;
+
+    public function __construct(string $screenName, int $age)
+    {
+        $this->screenName = $screenName;
+        $this->age = $age;
+    }
+
+    // ...
+}
+```
+
+**どうですか！！！！！！！！すごくないですか！？！？！？！？！？！？！？！？**（唐突な興奮）
+
+Rector には 600 個を超える様々なルールが用意されているので、使えそうなものがないか探してみてください。
+中には CakePHP の `App::uses()` を use 文に変えてくれるルールなどもあり、軽い感動を覚えます。
+
+
+- [ルールセットの一覧]()
+- [ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md)
 
 # カスタムルールを作る
 
