@@ -681,6 +681,17 @@ $node->name = new Node\Identifier($testName);
 return $node;
 ```
 
+## 作成したルールをテストする
+
+それではルールが問題なく実装できているか確認しましょう。
+**rector ディレクトリ内**で以下のコマンドを実行してテストを走らせてください。
+
+```bash:rector/
+$ composer test
+```
+
+エラーが発生していなければ OK です。
+
 # カスタムルールを実行する
 
 - config の書き方を紹介する
