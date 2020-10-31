@@ -694,8 +694,62 @@ $ composer test
 
 # カスタムルールを実行する
 
-- config の書き方を紹介する
-- config を元に rector を実行する
+自作したルールを実行するためには、コンフィグを設定し Rector にルールを登録する必要があります。
+
+**rector ディレクトリ内**で以下のコマンドを実行してコンフィグファイルを作成してください。
+
+```bash:rector/
+$ touch rector.php
+```
+
+作成したファイルに以下の内容を書き込んでください。
+
+```php:rector/rector.php
+<?php
+declare(strict_types=1);
+
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+return static function (ContainerConfigurator $containerConfigurator) : void {
+    $services = $containerConfigurator->services();
+
+    $services->set(\Yahiru\RectorTutorialRector\AddTestAnnotationRector::class);
+};
+```
+
+`ContainerConfigurator` についての詳しい使い方は [Symfony のドキュメント](https://symfony.com/doc/current/index.html) を参照していただければと思いますが、 `$services->set()` の部分でルールを Rector (というか DI コンテナ)に登録しています。
+
+config の作成が完了したら以下のコマンドで Rector を実行します。
+config ファイルで登録されたルールはオプションで渡さなくても有効になるので、ディレクトリの指定のみで OK です。
+
+```bash:rector/
+$ vendor/bin/rector process ../tests
+```
+
+それっぽい出力がなされたかと思いますが、実際に変更されたファイルを見てみましょう。
+以下のような差分が発生していれば成功です!
+
+```diff:tests/UserTest.php
++   /**
++    * @test
++    */
++   public function getScreenName() : void
+-   public function testGetScreenName() : void
+    {
+        $this->assertSame('test user', $this->user->getScreenName());
+    }
+
++   /**
++    * @test
++    */
++   public function getAge() : void
+-   public function testGetAge() : void
+    {
+        $this->assertSame(20, $this->user->getAge());
+    }
+}
+
+```
 
 # カスタムルールを作る際のコツ
 
