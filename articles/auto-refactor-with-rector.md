@@ -164,11 +164,249 @@ Rector を使ってリファクタリングを自動化することで工数を�
 - [ルールセットの一覧](https://github.com/rectorphp/rector/tree/master/config/set)
 - [ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md)
 
-# カスタムルールを作る
+# カスタムルール
 
-- テストの作り方を紹介する
-- test から始まるテストメソッドをアノテーション形式に変えるカスタムルールを実際に作る。
-- テストが通ることを確認する
+リファクタリングの要件はプロダクトによって様々なので Rector が用意してくれているルールだけでは**要件を満たせない**ことがあります。
+そういった場合に有効なのがカスタムルールです。
+
+カスタムルールとはつまり **Rector が用意してくれているようなルールを自分で作ってしまおう**という話です。
+カスタムルールを作ることが出来れば**プロダクト固有の要件であってもリファクタリングを自動化**することができます。
+
+今回はあなたの所属するチーム内で「PHPUnit のテストメソッドは、メソッド名に `test` という prefix を付ける形式ではなく `@test` アノテーションを使う形式にしたい」という要望が出たという設定で進めていきましょう。^[あくま記事の都合上の話であり @test アノテーションを推奨しているわけではありません。]
+
+## カスタムルールのテストを書く
+
+早速カスタムルールを作っていきたいのですが、まずは**どのようなコードをどのようにリファクタリングしたいのか**ということを明確にする必要があります。
+Rector はテスト基盤も整っていますので、テストを書くことでルールのイメージを固めていきましょう。
+
+ルールのテストでは必要なものが 2 つあります。
+
+1. テストクラス
+1. Fixture
+
+### テストクラス
+
+ここでいうテストクラスとは、 `PHPUnit\Framework\TestCase` を継承した任意のクラスのことです。
+Rector は `PHPUnit\Framework\TestCase` を拡張した `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` ^[継承関係には `Symplify\PackageBuilder\Tests` なども含まれていますが本筋から逸れるためスキップしています。] が用意されており、これによって**ルールのテストがとても簡単になる**ため今回はこれを利用します。
+
+**rector ディレクトリ内**で以下のコマンドを実行してテストクラス用のファイルを作成します。
+
+```bash:rector/
+$ mkdir -p tests/AddTestAnnotationRector
+$ touch tests/AddTestAnnotationRector/AddTestAnnotationRectorTest.php
+```
+
+ファイルが作成されたら、ファイルに以下の内容を書き込みます。
+
+```php:rector/tests/AddTestAnnotationRector/AddTestAnnotationRectorTest.php
+<?php
+declare(strict_types=1);
+namespace Yahiru\RectorTutorialRector\AddTestAnnotationRector;
+
+use Iterator;
+use Rector\Core\Testing\PHPUnit\AbstractRectorTestCase;
+use Symplify\SmartFileSystem\SmartFileInfo;
+use Yahiru\RectorTutorialRector\AddTestAnnotationRector;
+
+final class AddTestAnnotationRectorTest extends AbstractRectorTestCase
+{
+    /**
+     * @dataProvider provideData()
+     */
+    public function test(SmartFileInfo $fileInfo) : void
+    {
+        $this->doTestFileInfo($fileInfo);
+    }
+
+    /**
+     * @return Iterator<SmartFileInfo>
+     */
+    public function provideData() : Iterator
+    {
+        return $this->yieldFilesFromDirectory(__DIR__ . '/Fixture');
+    }
+
+    protected function getRectorClass() : string
+    {
+        return AddTestAnnotationRector::class;
+    }
+}
+```
+
+ルールのテストクラスは `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` を使うことで多くの場合に上記とほぼ同じ内容で済みます。
+
+`getRectorClass()` はテスト対象となるルールのクラス名を返却します。
+
+```php:rector/tests/AddTestAnnotationRector/AddTestAnnotationRectorTest.php
+    protected function getRectorClass(): string
+    {
+        return AddTestAnnotationRector::class;
+    }
+```
+
+ここで返却したルールを `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` 内でよしなにテストしてくれます。
+
+また `AddTestAnnotationRector` クラスはまだ存在していませんが、テストを実装した後に作成する予定です。
+
+`provideData()` は、この後作成する Fixture ファイルを読み込み、 `test()` は読み込まれた各 Fixture に対してテストを実行します。
+
+```php:rector/tests/AddTestAnnotationRector/AddTestAnnotationRectorTest.php
+    /**
+     * @dataProvider provideData()
+     */
+    public function test(SmartFileInfo $fileInfo): void
+    {
+        $this->doTestFileInfo($fileInfo);
+    }
+
+    /**
+     * @return Iterator<SmartFileInfo>
+     */
+    public function provideData(): Iterator
+    {
+        return $this->yieldFilesFromDirectory(__DIR__ . '/Fixture');
+    }
+```
+
+### Fixture
+
+Fixture とは、**リファクタリング前のコード** と **リファクタリング後のコード** が以下のフォーマットで記述されたファイルのことです。
+
+```
+<?php
+リファクタリング前のコード
+?>
+-----
+<?php
+リファクタリング後のコード
+?>
+```
+
+実際の Fixture を見た方が理解が早いので、早速 Fixture を作ってみましょう。
+**rector ディレクトリ内**で以下のコマンドを実行して Fixture を作成します。
+
+```bash:rector/
+$ mkdir -p tests/AddTestAnnotationRector/Fixture
+$ touch tests/AddTestAnnotationRector/Fixture/fixture.php.inc
+```
+
+今回は `test` という prefix がついているテストメソッドを `@test` アノテーション形式に変換するというのが要件ですので、作成したファイルに以下の内容を書き込みます。
+
+```php:rector/tests/AddTestAnnotationRector/Fixture/fixture.php.inc
+<?php
+namespace Yahiru\RectorTutorialRector\AddTestAnnotationRector\Fixture;
+
+class SomeTest extends \PHPUnit\Framework\TestCase
+{
+    public function testSome() : void
+    {
+        // do test
+    }
+}
+
+?>
+-----
+<?php
+namespace Yahiru\RectorTutorialRector\AddTestAnnotationRector\Fixture;
+
+class SomeTest extends \PHPUnit\Framework\TestCase
+{
+    /**
+     * @test
+     */
+    public function some() : void
+    {
+        // do test
+    }
+}
+
+?>
+```
+
+今作成した Fixture の差分は以下の通りです。
+`test` から始まるテストメソッドが `@test` アノテーション形式に変わっています。
+
+```diff
++   /**
++    * @test
++    */
++   public function some() : void
+-   public function testSome() : void
+    {
+        // do test
+    }
+```
+
+#### 注意点
+
+Fixture を作成する上での重要な注意点ですが、 Rector は**リファクタリング対象のコードを動的に読み込みます**。
+
+つまり今作成した Fixture に書かれているクラスも読み込まれるということなので、 Fixture にうっかり namespace を書き忘れてしまうと、他のテストの Fixture や既存クラスと**クラス名が衝突する可能性が増します**。
+
+なので絶対に Fixture には **namespace を忘れないように**しましょう。
+
+#### Fixture を複数用意する
+
+テストの準備自体はこれで完了ですが、テスト項目が足りていないのでもう少し Fixture を増やしたいと思います。
+
+今回のルールにおいて、メソッドがリファクタリング対象であると判断する基準は以下とします。
+
+1. クラスが `PHPUnit\Framework\TestCase` を継承していること
+1. メソッド名が `test` で始まっていること
+1. メソッドの可視性が public であること
+
+正常系は先ほどの Fixture で満たしているので、次は上記の条件以外ではリファクタリングされないことを保証する Fixture を追加します。
+テストしたい内容を明確にするために、**適切な粒度で Fixture を分ける**と良いでしょう。
+
+**rector ディレクトリ内**で以下のコマンドを実行してファイルを作成してください。
+
+```bash:rector/
+$ touch tests/AddTestAnnotationRector/Fixture/{no-test-prefix.php.inc,not-public-method.php.inc,not-test-class.php.inc}
+```
+
+コードの変更がない場合の Fixture は**リファクタリング後のコードを省くことが可能**ですので、それぞれのファイルに以下の内容を書き込みんでください。
+
+```php:rector/tests/AddTestAnnotationRector/Fixture/no-test-prefix.php.inc
+<?php
+namespace Yahiru\RectorTutorialRector\AddTestAnnotationRector\Fixture;
+
+class NotTestPrefix extends \PHPUnit\Framework\TestCase
+{
+    public function noPrefix() : void
+    {
+    }
+}
+```
+
+```php:rector/tests/AddTestAnnotationRector/Fixture/not-public-method.php.inc
+<?php
+namespace Yahiru\RectorTutorialRector\AddTestAnnotationRector\Fixture;
+
+class NotPublicMethodTest extends \PHPUnit\Framework\TestCase
+{
+    protected function testProtected() : void
+    {
+    }
+
+    private function testPrivate() : void
+    {
+    }
+}
+```
+
+```php:rector/tests/AddTestAnnotationRector/Fixture/not-test-class.php.inc
+<?php
+namespace Yahiru\RectorTutorialRector\AddTestAnnotationRector\Fixture;
+
+class NotTest
+{
+    public function testSome() : void
+    {
+    }
+}
+```
+
+Fixture の準備はこれで完了です。
 
 # カスタムルールを実行する
 
@@ -178,3 +416,7 @@ Rector を使ってリファクタリングを自動化することで工数を�
 # カスタムルールを作る際のコツ
 
 - やりたい内容に近いことを行っている既存のルールのコードを読むことが手取り早い
+
+```
+
+```
