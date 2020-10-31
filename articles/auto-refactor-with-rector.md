@@ -408,6 +408,279 @@ class NotTest
 
 Fixture の準備はこれで完了です。
 
+## カスタムルールを作る
+
+次はルールを作成します。
+ルールは基本的に `Rector\Core\Rector\AbstractRector` を継承して作成します。
+
+**rector ディレクトリ内**で以下のコマンドを実行してファイルを作成してください。
+
+```bash:rector/
+$ touch src/AddTestAnnotationRector.php
+```
+
+作成したファイルに以下の内容を書き込んでください。
+
+```php:rector/src/AddTestAnnotationRector.php
+<?php
+declare(strict_types=1);
+namespace Yahiru\RectorTutorialRector;
+
+use PhpParser\Node;
+use PhpParser\Node\Stmt\ClassMethod;
+use PHPUnit\Framework\TestCase;
+use Rector\Core\Rector\AbstractRector;
+use Rector\Core\RectorDefinition\CodeSample;
+use Rector\Core\RectorDefinition\RectorDefinition;
+use Rector\NodeTypeResolver\Node\AttributeKey;
+
+final class AddTestAnnotationRector extends AbstractRector
+{
+    public function getDefinition() : RectorDefinition
+    {
+        return new RectorDefinition('Add @test annotation', [
+            new CodeSample(
+                <<<'CODE_SAMPLE'
+                class SomeTest extends \PHPUnit\Framework\TestCase
+                {
+                    public function testSome() : void
+                    {
+                        // do test
+                    }
+                }
+                CODE_SAMPLE
+                ,
+                <<<'CODE_SAMPLE'
+                class SomeTest extends \PHPUnit\Framework\TestCase
+                {
+                    /**
+                     * @test
+                     */
+                    public function some() : void
+                    {
+                        // do test
+                    }
+                }
+                CODE_SAMPLE
+            ),
+        ]);
+    }
+
+    /**
+     * @phpstan-return array<class-string<Node>>
+     *
+     * @return array<string>
+     */
+    public function getNodeTypes() : array
+    {
+        return [ClassMethod::class];
+    }
+
+    /**
+     * @param ClassMethod $node
+     */
+    public function refactor(Node $node) : ?Node
+    {
+        if (! $this->shouldRefactor($node)) {
+            return null;
+        }
+
+        $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
+        if ($phpDocInfo === null) {
+            $phpDocInfo = $this->phpDocInfoFactory->createEmpty($node);
+        }
+
+        $phpDocInfo->addBareTag('@test');
+
+        $testName = \lcfirst(
+            (string) \preg_replace('/\Atest/', '', (string) $this->getName($node))
+        );
+        $node->name = new Node\Identifier($testName);
+
+        return $node;
+    }
+
+    private function shouldRefactor(ClassMethod $node) : bool
+    {
+        $class = $node->getAttribute(AttributeKey::CLASS_NODE);
+
+        return $node->isPublic()
+            && $this->isName($node, 'test*')
+            && $this->isObjectType($class, TestCase::class);
+    }
+}
+```
+
+#### getDefinition
+
+`getDefinition()` はリファクタリング前後のイメージを返します。
+
+```php:rector/src/AddTestAnnotationRector.php
+    public function getDefinition() : RectorDefinition
+    {
+        return new RectorDefinition('Add @test annotation', [
+            new CodeSample(
+                <<<'CODE_SAMPLE'
+                class SomeTest extends \PHPUnit\Framework\TestCase
+                {
+                    public function testSome() : void
+                    {
+                        // do test
+                    }
+                }
+                CODE_SAMPLE
+                ,
+                <<<'CODE_SAMPLE'
+                class SomeTest extends \PHPUnit\Framework\TestCase
+                {
+                    /**
+                     * @test
+                     */
+                    public function some() : void
+                    {
+                        // do test
+                    }
+                }
+                CODE_SAMPLE
+            ),
+        ]);
+    }
+```
+
+カスタムルールにおいてこれは必須ではないですが、ルールの利用者がルールの性質を理解する手助けとなるので書いておいて損はないでしょう。
+
+#### getNodeTypes
+
+`getNodeTypes()` はリファクタリング対象の Node クラスの配列を返却します。
+
+```php:rector/src/AddTestAnnotationRector.php
+    public function getNodeTypes() : array
+    {
+        return [ClassMethod::class];
+    }
+```
+
+今回はクラスメソッド以外には興味がないので `PhpParser\Node\Stmt\ClassMethod` だけを指定しています。
+Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/docs/nodes_overview.md)から確認できます。
+
+#### refactor
+
+`refactor()` はルールの核となるメソッドです。
+このメソッドで `$node` を書き換え返却するとその内容が反映され、 `null` を返すとスキップされます。
+
+```php:rector/src/AddTestAnnotationRector.php
+    /**
+     * @param ClassMethod $node
+     */
+    public function refactor(Node $node) : ?Node
+    {
+        if (! $this->shouldRefactor($node)) {
+            return null;
+        }
+
+        // ...
+
+        return $node;
+    }
+```
+
+今回は `getDefinition()` で `PhpParser\Node\Stmt\ClassMethod` のみを指定しているため `refactor()` には `PhpParser\Node\Stmt\ClassMethod` のインスタンスのみ渡されることが Rector によって保証されています。
+
+なので PHPDoc は`@param PhpParser\Node\Stmt\ClassMethod $node`とし、 `$node` は `PhpParser\Node\Stmt\ClassMethod` のインスタンスであることを前提にロジックを組み立てて構いません。
+
+```php:rector/src/AddTestAnnotationRector.php
+    public function refactor(Node $node) : ?Node
+    {
+        // こういうことはしなくて良い
+        if (! $node instanceof ClassMethod) {
+            return null;
+        }
+    }
+```
+
+クラスメソッドであれば何でもリファクタリングしていいというわけではないので、 `refactor()` の最初にブロック文を実装しています。
+`shouldRefactor()` はリファクタリングをすべきかどうかを判断するために実装したメソッドで、 `AddTestAnnotationRector` クラス固有のものです。
+
+```php:rector/src/AddTestAnnotationRector.php
+    /**
+     * @param ClassMethod $node
+     */
+    public function refactor(Node $node) : ?Node
+    {
+        if (! $this->shouldRefactor($node)) {
+            return null;
+        }
+
+        // ...
+    }
+
+    private function shouldRefactor(ClassMethod $node) : bool
+    {
+        // クラスメソッドが実装されているクラス情報を取得
+        $class = $node->getAttribute(AttributeKey::CLASS_NODE);
+
+        return
+            // メソッドの可視性が public かどうか
+            $node->isPublic()
+            // メソッド名が `test` から始まっているかどうか
+            && $this->isName($node, 'test*')
+            // メソッドが実装されているクラスが `PHPUnit\Framework\TestCase` を継承しているかどうか
+            && $this->isObjectType($class, TestCase::class);
+    }
+```
+
+無事ブロック文を抜けたら、実際にリファクタリングをします。
+
+```php:rector/src/AddTestAnnotationRector.php
+    public function refactor(Node $node) : ?Node
+    {
+        // ...
+
+        $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
+        if ($phpDocInfo === null) {
+            $phpDocInfo = $this->phpDocInfoFactory->createEmpty($node);
+        }
+
+        $phpDocInfo->addBareTag('@test');
+
+        $testName = \lcfirst(
+            (string) \preg_replace('/\Atest/', '', (string) $this->getName($node))
+        );
+        $node->name = new Node\Identifier($testName);
+
+        return $node;
+    }
+```
+
+まず最初に PHPDoc に `@test` アノテーションを追加する処理をしています。
+
+```php:rector/src/AddTestAnnotationRector.php
+// `$node` から PHP Doc の情報を取得
+$phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
+if ($phpDocInfo === null) { // PHP Doc がない場合は空の PHP Doc を作成する
+    $phpDocInfo = $this->phpDocInfoFactory->createEmpty($node);
+}
+
+$phpDocInfo->addBareTag('@test'); // PHP Doc に `@test` タグを追加する
+```
+
+次に `$this->getName($node)` で取得したメソッド名を元に新しいメソッド名を設定し直しています。
+
+```php:rector/src/AddTestAnnotationRector.php
+// 元のメソッド名から `test` prefix を削除し、最初の1文字を小文字に変更した文字列
+$testName = \lcfirst(
+    (string) \preg_replace('/\Atest/', '', (string) $this->getName($node))
+);
+// `$testName` を新しいメソッド名として設定しなおす
+$node->name = new Node\Identifier($testName);
+```
+
+最後に `$node` を返却して、変更があったことを Rector に知らせて完了です。
+
+```php:rector/src/AddTestAnnotationRector.php
+return $node;
+```
+
 # カスタムルールを実行する
 
 - config の書き方を紹介する
