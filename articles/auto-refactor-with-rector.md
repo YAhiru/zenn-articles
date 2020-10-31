@@ -129,7 +129,7 @@ Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} -
 
 **rector ディレクトリ内で** 以下のコマンドを実行してみましょう。
 
-```bash
+```bash:rector/
 $ vendor/bin/rector process ../src --set php74 --only Rector\Php74\Rector\Property\TypedPropertyRector
 ```
 
