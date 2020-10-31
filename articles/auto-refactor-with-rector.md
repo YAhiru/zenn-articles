@@ -748,13 +748,24 @@ $ vendor/bin/rector process ../tests
         $this->assertSame(20, $this->user->getAge());
     }
 }
-
 ```
 
 # カスタムルールを作る際のコツ
 
 - やりたい内容に近いことを行っている既存のルールのコードを読むことが手取り早い
 
-```
+# 参考リンク
 
-```
+## 基本
+- [PHP\-Parser/Walking_the_AST\.markdown at master · nikic/PHP\-Parser](https://github.com/nikic/PHP-Parser/blob/master/doc/component/Walking_the_AST.markdown)
+- [rector/config/set at master · rectorphp/rector](https://github.com/rectorphp/rector/tree/master/config/set)
+- [rector/rector_rules_overview\.md at master · rectorphp/rector](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md)
+
+## config 周り
+- [rectorphp/rector: Instant Upgrades and Instant Refactoring of any PHP 5\.3\+ code](https://github.com/rectorphp/rector#full-config-configuration)
+- [rector/how_to_configure_rules\.md at master · rectorphp/rector](https://github.com/rectorphp/rector/blob/master/docs/how_to_configure_rules.md)
+- [Service Container \(Symfony Docs\)](https://symfony.com/doc/current/service_container.html)
+
+## 自作ルール
+- [rector/nodes_overview\.md at master · rectorphp/rector](https://github.com/rectorphp/rector/blob/master/docs/nodes_overview.md)
+- [rector/how_to_add_test_for_rector_rule\.md at master · rectorphp/rector](https://github.com/rectorphp/rector/blob/master/docs/how_to_add_test_for_rector_rule.md)
