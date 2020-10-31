@@ -187,7 +187,7 @@ Rector はテスト基盤も整っていますので、テストを書くこと�
 ### テストクラス
 
 ここでいうテストクラスとは、 `PHPUnit\Framework\TestCase` を継承した任意のクラスのことです。
-Rector は `PHPUnit\Framework\TestCase` を拡張した `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` ^[継承関係には `Symplify\PackageBuilder\Tests` なども含まれていますが本筋から逸れるためスキップしています。] が用意されており、これによって**ルールのテストがとても簡単になる**ため今回はこれを利用します。
+Rector は `PHPUnit\Framework\TestCase` を拡張した `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` ^[継承関係には `Symplify\PackageBuilder\Tests\AbstractKernelTestCase` なども含まれていますが本筋から逸れるためスキップしています。] が用意されており、これによって**ルールのテストがとても簡単になる**ため今回はこれを利用します。
 
 **rector ディレクトリ内**で以下のコマンドを実行してテストクラス用のファイルを作成します。
 
