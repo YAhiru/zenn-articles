@@ -543,7 +543,7 @@ final class AddTestAnnotationRector extends AbstractRector
     }
 ```
 
-Node とは Rector 内部で使用されている [nikic/php-parser](https://github.com/nikic/PHP-Parser) によって AST (抽象構文木) にパースされた結果の各要素のことです。
+Node とは Rector 内部で使用されている [nikic/php-parser](https://github.com/nikic/PHP-Parser) によって [AST (抽象構文木)](https://ja.wikipedia.org/wiki/%E6%8A%BD%E8%B1%A1%E6%A7%8B%E6%96%87%E6%9C%A8) にパースされた結果の各要素のことです。
 
 今回はクラスメソッド以外には興味がないので `PhpParser\Node\Stmt\ClassMethod` だけを指定しています。
 Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/docs/nodes_overview.md)から確認できます。
