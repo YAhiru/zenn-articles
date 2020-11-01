@@ -103,7 +103,7 @@ final class User
 }
 ```
 
-User クラスのプロパティである `$screenName` や `$age` を見てみると [Typed Property](https://wiki.php.net/rfc/typed_properties_v2) が適用されていないことがわかります。
+User クラスのプロパティである `$screenName` や `$age` を見てみると [Typed Property](https://www.php.net/manual/ja/language.oop5.properties.php#language.oop5.properties.typed-properties) が適用されていないことがわかります。
 Typed Property が適用されていない場合 PHP Doc に記述された型以外が代入された場合でもエラーが発生せず、思わぬバグを引き起こす可能性を秘めています。
 あなたの所属するチーム内でこのことが問題視されたという設定で、Rector を使ってこのクラスを自動リファクタリングしてみましょう。
 
