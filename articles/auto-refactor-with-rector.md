@@ -238,7 +238,7 @@ final class AddTestAnnotationRectorTest extends AbstractRectorTestCase
 
 ここで返却したルールを `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` 内でよしなにテストしてくれます。
 
-また `AddTestAnnotationRector` クラスはまだ存在していませんが、テストを実装した後に作成する予定です。
+`AddTestAnnotationRector` クラスはまだ存在していませんが、テストを実装した後に作成する予定です。
 
 `provideData()` はこの後作成する予定の Fixture ファイルを読み込み、 `test()` は読み込まれた Fixture を利用してテストを実行します。
 
@@ -554,13 +554,15 @@ final class AddTestAnnotationRector extends AbstractRector
     }
 ```
 
+Node とは Rector 内部で使用されている [nikic/php-parser](https://github.com/nikic/PHP-Parser) によって AST (抽象構文木) にパースされた結果の各要素のことです。
+
 今回はクラスメソッド以外には興味がないので `PhpParser\Node\Stmt\ClassMethod` だけを指定しています。
 Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/docs/nodes_overview.md)から確認できます。
 
 #### refactor
 
 `refactor()` はルールの核となるメソッドです。
-このメソッドに渡された **`$node` を書き換えることでその内容がファイルに反映されます**。
+このメソッドに渡された **`$node` を書き換えることでその内容がファイルに反映され**、**スキップする場合は null を返却**します。
 
 ```php:rector/src/AddTestAnnotationRector.php
     /**
@@ -572,7 +574,7 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
             return null;
         }
 
-        // ...
+        // do refactor
 
         return $node;
     }
@@ -673,6 +675,8 @@ $node->name = new Node\Identifier($testName);
 return $node;
 ```
 
+`refactor()` の挙動をより理解したい場合は `nikic/php-parser` の [Walking the AST](https://github.com/nikic/PHP-Parser/blob/master/doc/component/Walking_the_AST.markdown) がオススメです。
+
 ## 作成したルールをテストする
 
 それではルールが問題なく実装できているか確認しましょう。
@@ -709,7 +713,7 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
 };
 ```
 
-`ContainerConfigurator` についての詳しい使い方は [Symfony のドキュメント](https://symfony.com/doc/current/index.html) を参照していただければと思いますが、 `$services->set()` の部分でルールを Rector (というか DI コンテナ)に登録しています。
+`ContainerConfigurator` についての詳しい使い方は [Symfony のドキュメント](https://symfony.com/doc/current/index.html) を参照していただければと思いますが、 `$services->set()` の部分でルールを Rector に登録しています。
 
 config の作成が完了したら以下のコマンドで Rector を実行します。
 **config ファイルで登録されたルールはオプションで渡さなくても有効になる**ので、引数はディレクトリの指定のみで OK です。
@@ -741,6 +745,8 @@ $ vendor/bin/rector process ../tests
     }
 }
 ```
+
+そのほかに config で設定できる内容は [こちら](https://github.com/rectorphp/rector#full-config-configuration) に記載されています。
 
 # カスタムルールを作る際のコツ
 
