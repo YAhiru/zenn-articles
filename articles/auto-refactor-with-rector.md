@@ -21,7 +21,7 @@ published: false
 
 小規模なものであれば手作業でおこなっても問題のないことが多いですが、大規模になると**うっかりミスが発生しがち**だったり単純作業ゆえの**精神的な苦痛**が伴うこともあったりなど、あまり好ましくありません。
 
-これから紹介する [Rector](https://github.com/rectorphp/rector) は、そういった**機械的な作業からエンジニアを開放する**とてもすごいツールです。
+本記事で紹介する [Rector](https://github.com/rectorphp/rector) はそういった**機械的な作業からエンジニアを開放する**とてもすごいツールです。
 
 是非この記事で Rector の基本的な使い方を覚え、日々の業務を楽にしてみてください。
 
@@ -41,7 +41,6 @@ published: false
 ```bash
 $ git clone git@github.com:YAhiru/rector-tutorial.git
 $ cd rector-tutorial
-$ composer i
 ```
 
 ## サンプルプロジェクトの確認
@@ -69,7 +68,7 @@ rector ディレクトリはこの記事の後半で実装するカスタムル�
 Rector は `composer req --dev rector/rector` を実行して利用する他に [phar](https://github.com/rectorphp/rector-prefixed) や [docker](https://hub.docker.com/r/rector/rector) などの形式が用意されています。
 [Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **カスタムルールを作りたいなどのニーズがない場合は phar あるいは docker 形式での利用をおすすめします**。
 
-今回は最終的にカスタムルールを作りたいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題が予想されます。
+今回は最終的にカスタムルールを作りたいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題の発生が予想されます。
 そういった場合に有効なのが **Rector 用のサブディレクトリを作成しその中で Rector 関連のコードを完結させること**です。^[[アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!]
 今回のサンプルプロジェクトでもそのアプローチを採用しています。
 
@@ -80,7 +79,7 @@ $ cd rector
 $ composer req rector/rector
 ```
 
-# 予め用意されているルールを適用してみる
+# ルールを適用してみる
 
 それでは Rector を試していきたいと思います。
 今回自動リファクタリングをしてみるファイルは `src/User.php` です。
@@ -109,19 +108,21 @@ Typed Property が適用されていない場合 PHP Doc に記述された型�
 
 ## Rector を実行する
 
-Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} --set {{ルールセット}}` のように、 process コマンドに実行したいディレクトリや適用したい **ルールセット** や **ルール** を渡せば良いだけです。
+Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} --set {{ルールセット}}` のように、 process コマンドに対してターゲットとなるディレクトリや適用したい **ルールセット** や **ルール** を渡せば良いだけです。
 
 |名前|説明|
 |---|---|
 |ルール|リファクタリングの内容が定義された PHP のクラス|
 |ルールセット|関心ごとが近い複数のルールがまとめられたもの|
 
-今回は Typed Property だけを適用してくれればよいので、 **php74** というルールセットの中にある **Rector\Php74\Rector\Property\TypedPropertyRector** というルールのみを採用したいと思います。
+今回は Typed Property だけを適用してくれればよいので、 **php74** というルールセットの中にある **Rector\Php74\Rector\Property\TypedPropertyRector** というルールのみを適用したいと思います。
 
-**rector ディレクトリ内で** 以下のコマンドを実行してみましょう。
+**rector ディレクトリ内で**以下のコマンドを実行してみましょう。
 
 ```bash:rector/
-$ vendor/bin/rector process ../src --set php74 --only Rector\Php74\Rector\Property\TypedPropertyRector
+$ vendor/bin/rector process ../src \
+    --set php74 \
+    --only 'Rector\Php74\Rector\Property\TypedPropertyRector'
 ```
 
 ## 修正されたファイルを確認する
@@ -146,7 +147,7 @@ final class User
 
 **どうですか！！！！！！！！すごくないですか！？！？！？！？！？！？！？！？**（唐突な興奮）
 
-Rector を使ってリファクタリングを自動化することで工数を大幅に削減することが出来るため、あなたはチームメンバーに一目を置かれる存在となることができます。
+Rector を使ってリファクタリングを自動化することで**修正規模によっては工数を大幅に削減することが出来る**ため、あなたの上司もニッコリです。
 
 ## その他のルールの紹介
 
