@@ -234,8 +234,7 @@ final class AddTestAnnotationRectorTest extends AbstractRectorTestCase
     }
 ```
 
-ここで返却したルールを `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` 内でよしなにテストしてくれます。
-
+ここで返却したルールを `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` 内でよしなに扱ってくれます。
 `AddTestAnnotationRector` クラスはまだ存在していませんが、テストを実装した後に作成する予定です。
 
 `provideData()` はこの後作成する予定の Fixture ファイルを読み込み、 `test()` は読み込まれた Fixture を利用してテストを実行します。
@@ -260,7 +259,7 @@ final class AddTestAnnotationRectorTest extends AbstractRectorTestCase
 
 ### Fixture
 
-Fixture とは、**リファクタリング前のコード** と **リファクタリング後のコード** が以下のフォーマットで記述されたファイルのことです。
+Fixture とは、以下のフォーマットで **リファクタリング前のコード** と **リファクタリング後のコード** が記述されたファイルのことです。
 
 ```
 <?php
@@ -314,6 +313,7 @@ class SomeTest extends \PHPUnit\Framework\TestCase
 ```
 
 書き込んだ内容が前述のフォーマット通りになっていることを確認してください。
+また、使用しているエディターによっては上記のコードをコピペした際にリファクタリング前と後の区切りを表す `-----` の直前にスペースが入り込むことがあるので注意してください。
 
 また、作成した Fixture の差分は以下の通りです。
 テストメソッドが `@test` アノテーション形式に変わっています。
@@ -335,7 +335,7 @@ Fixture を作成する上での重要な注意点ですが、 Rector は**リ�
 
 つまり今作成した **Fixture に定義されているクラスも読み込まれる**ということなので、 Fixture にうっかり namespace を書き忘れてしまうと、他のテストの Fixture や既存クラスと**クラス名が衝突する可能性が増します**。
 
-なので絶対に **Fixture には namespace を忘れないように**しましょう。
+なので絶対に **Fixture には namespace を書くように**しましょう。
 
 #### Fixture を複数用意する
 
@@ -560,7 +560,8 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
 #### refactor
 
 `refactor()` はルールの核となるメソッドです。
-このメソッドに渡された **`$node` を書き換えることでその内容がファイルに反映され**、**スキップする場合は null を返却**します。
+このメソッドに渡された **`$node` を書き換えることでその内容がファイルに反映されます**。
+また、**スキップする場合は null を返却**します。
 
 ```php:rector/src/AddTestAnnotationRector.php
     /**
@@ -578,7 +579,7 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
     }
 ```
 
-今回は `getDefinition()` で `PhpParser\Node\Stmt\ClassMethod` のみを指定しているため `refactor()` には **`PhpParser\Node\Stmt\ClassMethod` のインスタンスのみが渡される**ことが Rector によって保証されています。
+今回は `getDefinition()` で `PhpParser\Node\Stmt\ClassMethod` のみを指定しているため、 Rector によって `refactor()` には **`PhpParser\Node\Stmt\ClassMethod` のインスタンスのみが渡される**ことが保証されています。
 
 なので PHPDoc は`@param PhpParser\Node\Stmt\ClassMethod $node`とし、 `$node` は `PhpParser\Node\Stmt\ClassMethod` のインスタンスであることを前提にロジックを組み立てて構いません。
 
@@ -620,7 +621,7 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
 ```
 `shouldRefactor()` はリファクタリングをすべきかどうかを判断するために実装したメソッドで、 **`AddTestAnnotationRector` クラス固有のもの**です。
 
-ブロック文を抜けたら `$node` に変更を加えリファクタリングをします。
+ブロック文を抜けたらコードの修正に相当するロジックを実行し `$node` に変更を加えます。
 
 ```php:rector/src/AddTestAnnotationRector.php
     public function refactor(Node $node) : ?Node
@@ -643,10 +644,10 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
     }
 ```
 
-まず最初に PHPDoc に `@test` アノテーションを追加する処理をしています。
+まず最初に PHP Doc に `@test` アノテーションを追加する処理をしています。
 
 ```php:rector/src/AddTestAnnotationRector.php
-// `$node` から PHP Doc の情報を取得
+// メソッドの PHP Doc を取得
 $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
 if ($phpDocInfo === null) {
     // PHP Doc がない場合は空の PHP Doc を作成する
@@ -673,7 +674,7 @@ $node->name = new Node\Identifier($testName);
 return $node;
 ```
 
-`refactor()` の挙動をより理解したい場合は `nikic/php-parser` の [Walking the AST](https://github.com/nikic/PHP-Parser/blob/master/doc/component/Walking_the_AST.markdown) がオススメです。
+`refactor()` の挙動をより理解したい場合は `nikic/php-parser` の [Walking the AST](https://github.com/nikic/PHP-Parser/blob/master/doc/component/Walking_the_AST.markdown) を読むことをオススメします。
 
 ## 作成したルールをテストする
 
@@ -685,6 +686,7 @@ $ composer test
 ```
 
 エラーが発生していなければ OK です。
+テストが落ちた場合は Fixture の内容が記事の内容と一致しているか改めて確認してください。
 
 # カスタムルールを実行する
 
@@ -696,7 +698,7 @@ $ composer test
 $ vendor/bin/rector init
 ```
 
-作成されたファイルを以下の内容で書き換えてください。
+`rector.php` というファイルが rector ディレクトリに作成されたかと思うので、作成されたファイルを以下の内容で書き換えてください。
 
 ```php:rector/rector.php
 <?php
