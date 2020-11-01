@@ -5,9 +5,6 @@ type: "tech"
 topics: ["php", "rector"] # タグ。["markdown", "rust", "aws"]のように指定する
 published: false
 ---
-# Todo
-- [ ] その他のルールはもっと後半に紹介する形でもいいかも
-- [ ] getNodeTypes でいきなり Node という単語を使っているが、ちゃんと説明した方がいいのでは。 (php-parser 周りの説明すれば理解しやすそう)
 
 # はじめに
 
