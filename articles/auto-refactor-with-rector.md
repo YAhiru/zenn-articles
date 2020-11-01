@@ -27,7 +27,7 @@ published: false
 
 # サンプルプロジェクトの構築
 
-この記事では予め用意されたサンプルコードに対して Rector を実際に実行することで理解を深めていきたいと思います。
+この記事では予め用意された[サンプルコード](https://github.com/YAhiru/rector-tutorial)に対して Rector を実際に実行することで理解を深めていきたいと思います。
 
 ## 推奨環境
 :::message
