@@ -752,7 +752,36 @@ $ vendor/bin/rector process ../tests
 
 # カスタムルールを作る際のコツ
 
-- やりたい内容に近いことを行っている既存のルールのコードを読むことが手取り早い
+駆け足でいろいろと解説しましたが、自力でルールを作るとなると戸惑ってしまうかと思います。
+というのも Rector のドキュメントではカスタムルールを作るための説明がかなり少ないためです。
+
+そこで、カスタムルールを作るときに知っていると便利なことをいくつか共有したいと思います。
+
+## やりたい内容に近いことを行っているルールを探す
+
+基本的にはほぼこれでルールを自作できます。
+
+[ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md) からやりたい内容に近いことを行っているルールを見つけて、コードを読んでみます。
+
+たとえば PHP Doc 周りのリファクタリングがしたい場合は上記のページからページ内検索で `+    /**` のような PHP Doc っぽい文字列で検索してみると案外簡単に見つかります。
+ルールが見つかったら、あとはコードを読むだけで大体それっぽいことが出来るようになります。
+
+コードを読んでみるとわかるのですが、ルールの実装に便利なクラス・メソッドはすでにたくさん実装されています。
+「こんなことできないかな」というものがあれば是非 Rector の中をいろいろと探してみてください。
+
+## よく使うメソッド・クラス
+パッと思いついたクラスやメソッドを共有します。
+基本的には既存のルールのコードを読んでいると便利メソッドをいろいろと発見できます。
+
+| クラス | メソッド | 説明 |
+| --- | --- | --- |
+|Rector\Core\Rector\AbstractRector|isName|第一引数の Node の名前が 第二引数の文字列と一致するか判定してくれる。第二引数には正規表現も使える|
+|Rector\Core\Rector\AbstractRector|getName|第一引数に渡した Node の名前を返してくれる|
+|Rector\Core\Rector\AbstractRector|getShortName|FQN を渡すとショートネームを返してくれる|
+|Rector\Core\Rector\AbstractRector|isObjectType|第一引数に渡した Node が第二引数のクラスのインスタンスか判定してくれる(Class\_ など型情報を持つ Node に使う)|
+|PhpParser\NodeAbstract|getAttribute|Rector\NodeTypeResolver\Node\AttributeKey の定数を使うことで色んな情報を Node から取得できる|
+|Rector\Core\PhpParser\Node\BetterNodeFinder|find\*|Node の配列と検索条件を渡すと、検索条件にマッチする Node だけ返してくれる|
+|Rector\Core\Rector\AbstractPHPUnitRector| - |PhpUnit 関連のルールを作るときに便利。今回作ったカスタムルールのテストメソッド判定ルールも、実はこのクラスで既に実装されてる。|
 
 # 参考リンク
 
