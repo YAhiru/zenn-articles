@@ -3,7 +3,7 @@ title: "Rector で始める自動リファクタリング入門"
 emoji: "🍖"
 type: "tech"
 topics: ["php", "rector"] # タグ。["markdown", "rust", "aws"]のように指定する
-published: false
+published: true
 ---
 
 # はじめに
