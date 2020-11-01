@@ -60,7 +60,7 @@ $ composer i
 └── tests     # サンプルのアプリケーションコードのテストディレクトリ
 ```
 
-理由は後述しますが Rector 用のディレクトリとサンプルのアプリケーションコードを分けています。
+理由は後述しますが **Rector 用のディレクトリとサンプルのアプリケーションコードを分けています**。
 
 ここでいうアプリケーションコードとは Web アプリケーションであればコントローラーやエンティティなどに当たるもので、リファクタリングの対象となるコードです。
 今回は src ディレクトリに単純なクラスを 1 つだけ用意しています。
@@ -70,7 +70,7 @@ rector ディレクトリはこの記事の後半で実装するカスタムル�
 # インストール
 
 Rector は `composer req --dev rector/rector` を実行して利用する他に [phar](https://github.com/rectorphp/rector-prefixed) や [docker](https://hub.docker.com/r/rector/rector) などの形式が用意されています。
-[Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **カスタムルールを作りたいなどのニーズがない場合** は phar あるいは docker 形式での利用をおすすめします。
+[Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **カスタムルールを作りたいなどのニーズがない場合は phar あるいは docker 形式での利用をおすすめします**。
 
 今回は最終的にカスタムルールを作りたいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題が予想されます。
 そういった場合に有効なのが **Rector 用のサブディレクトリを作成しその中で Rector 関連のコードを完結させること**です。^[[アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!]
@@ -114,9 +114,10 @@ Typed Property が適用されていない場合 PHP Doc に記述された型�
 
 Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} --set {{ルールセット}}` のように、 process コマンドに実行したいディレクトリや適用したい **ルールセット** や **ルール** を渡せば良いだけです。
 
-唐突にルールやルールセットという単語を使いましたが、
-ルールとは**リファクタリングの内容が定義された PHP のクラス**のことで、
-ルールセットとは**関心ごとが近い複数のルールがまとめられたもの**のことです。
+|名前|説明|
+|---|---|
+|ルール|リファクタリングの内容が定義された PHP のクラス|
+|ルールセット|関心ごとが近い複数のルールがまとめられたもの|
 
 今回は Typed Property だけを適用してくれればよいので、 **php74** というルールセットの中にある **Rector\Php74\Rector\Property\TypedPropertyRector** というルールのみを採用したいと思います。
 
