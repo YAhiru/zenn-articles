@@ -785,17 +785,17 @@ public function testFoo() : void
 よく使うメソッドやクラスをパッと思いついた範囲で共有します。
 この他には**既存のルールのコードを読むことで便利なメソッドをいろいろと発見できる**かと思われます。
 
-| クラス | メソッド | 説明 |
-| --- | --- | --- |
-|Rector\Core\Rector\AbstractRector|isName|第一引数の Node の名前が 第二引数の文字列と一致するか判定してくれる。第二引数には正規表現も使える|
-|Rector\Core\Rector\AbstractRector|getName|第一引数に渡した Node の名前を返してくれる|
-|Rector\Core\Rector\AbstractRector|getShortName|FQN を渡すとショートネームを返してくれる|
-|Rector\Core\Rector\AbstractRector|isObjectType|第一引数に渡した Node が第二引数のクラスとマッチするか判定してくれる(Class\_ など型情報を持つ Node に使う)|
-|PhpParser\NodeAbstract|getAttribute|Rector\NodeTypeResolver\Node\AttributeKey の定数を使うことで様々な情報を Node から取得できる|
-|Rector\Core\PhpParser\Node\BetterNodeFinder|find\*|Node の配列と検索条件を渡すと, 検索条件にマッチする Node だけ返してくれる|
-|Rector\Core\Rector\AbstractPHPUnitRector| - |PhpUnit 関連のルールを作るときに便利。今回作ったルールのテストメソッドの判定ルールも実はこのクラスで既に実装されてる。|
-|Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo|hasByName|引数に渡した文字列にマッチするタグが PhpDoc に含まれているかどうか判定してくれる|
-|Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo|getTagsByName|引数に渡した文字列にマッチするタグを取得する|
+| クラス・メソッド | 説明 |
+| --- | --- |
+|Rector\Core\Rector\AbstractRecto::isName\(\)|第一引数の Node の名前が 第二引数の文字列と一致するか判定してくれる。第二引数には正規表現も使える|
+|Rector\Core\Rector\AbstractRecto::getName\(\)|第一引数に渡した Node の名前を返してくれる|
+|Rector\Core\Rector\AbstractRecto::getShortName\(\)|FQN を渡すとショートネームを返してくれる|
+|Rector\Core\Rector\AbstractRecto::isObjectType\(\)|第一引数に渡した Node が第二引数のクラスとマッチするか判定してくれる(Class\_ など型情報を持つ Node に使う)|
+|PhpParser\NodeAbstract::getAttribute\(\)|Rector\NodeTypeResolver\Node\AttributeKey の定数を使うことで様々な情報を Node から取得できる|
+|Rector\Core\PhpParser\Node\BetterNodeFinder::find\*\(\)|Node の配列と検索条件を渡すと, 検索条件にマッチする Node だけ返してくれる|
+|Rector\Core\Rector\AbstractPHPUnitRector|PhpUnit 関連のルールを作るときに便利。今回作ったルールのテストメソッドの判定ルールも実はこのクラスで既に実装されてる。|
+|Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo::hasByName\(\)|引数に渡した文字列にマッチするタグが PhpDoc に含まれているかどうか判定してくれる|
+|Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo::getTagsByName\(\)|引数に渡した文字列にマッチするタグを取得する|
 
 ### 参考になるリンク一覧
 
