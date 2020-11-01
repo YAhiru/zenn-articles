@@ -713,7 +713,7 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
 };
 ```
 
-`ContainerConfigurator` についての詳しい使い方は [Symfony のドキュメント](https://symfony.com/doc/current/index.html) を参照していただければと思いますが、 `$services->set()` の部分でルールを Rector に登録しています。
+`ContainerConfigurator` についての詳しい使い方は [Symfony のドキュメント](https://symfony.com/doc/current/service_container.html) を参照していただければと思いますが、 `$services->set()` の部分でルールを Rector に登録しています。
 
 config の作成が完了したら以下のコマンドで Rector を実行します。
 **config ファイルで登録されたルールはオプションで渡さなくても有効になる**ので、引数はディレクトリの指定のみで OK です。
