@@ -723,7 +723,7 @@ $ vendor/bin/rector process ../tests
 ```
 
 それっぽさのある出力がなされたかと思いますが、実際に変更されたファイルを見てみましょう。
-以下のような差分が発生していれば成功です!
+`tests/UserTest.php` に以下のような差分が発生していれば成功です!
 
 ```diff:tests/UserTest.php
 +   /**
@@ -746,12 +746,9 @@ $ vendor/bin/rector process ../tests
 }
 ```
 
-そのほかに config で設定できる内容は [こちら](https://github.com/rectorphp/rector#full-config-configuration) に記載されています。
-
 # Next Step
 
-駆け足でいろいろと解説しましたが、**意外と簡単そうだな**という感想を抱いた方も多いのではないでしょうか？
-ここまでの知識で**自力でカスタムルールを作ることも可能**になっているかと思われますので、是非次はご自身でカスタムルールを作ってみてください。
+駆け足でいろいろと解説しましたが、**意外と簡単そうだな**という感想を抱いた方も多いのではないでしょうか。
 きっとより理解を深めることが出来ると思います!!
 
 ...とはいえ、そんなに都合よく作りたいカスタムルールがあるとは限りませんよね。
@@ -769,8 +766,7 @@ public function testFoo() : void
 }
 ```
 
-このようなテストメソッドに今回作成したカスタムルールを適用すると PHP Doc に `@test` アノテーションが**重複して書き込まれてしまいます**。
-なので、既に `@test` アノテーションがある場合は PHP Doc に変更を加えないようにするように修正してみてましょう。
+なので、既に `@test` アノテーションがある場合は PHP Doc に変更を加えないような修正をしてみましょう。
 
 ## カスタムルールを作る際のコツ
 
@@ -782,27 +778,27 @@ public function testFoo() : void
 ### やりたい内容に近いことを行っているルールを探す
 
 ドキュメントがあまりないので**最良の教材は既存ルールのコード**ということになります。
-幸い Rector には600を超えるルールが既に実装されているので、**ドキュメントがなくとも何とかなります**。
+幸い Rector には**600を超えるルールが既に実装されている**ので、**ドキュメントがなくとも何とかなります**。
 
 探し方としては、[ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md) からページ内検索をするのが早いと思います。
 ルール一覧には**リファクタリング前後の差分が PHP コードとして掲載されている**ので、それを手掛かりにすると簡単に見つけることができます。
 
-たとえば PHP Doc 周りのリファクタリングがしたい場合は上記のページから**ページ内検索**で `/**` のような PHP Doc っぽい文字列で検索してみると**案外簡単に見つかります**。
-あまりにも大量にヒットしてしまう場合は差分の表現である `+` や `-` とセットで `+␣␣␣␣/**` などと検索をすると検索結果を絞ることができます。(`␣` は半角スペースに読み替えてください)
+たとえば PHP Doc 関連のリファクタリングがしたい場合は、上記のページから**ページ内検索**で `/**` のような PHP Doc っぽい文字列で検索してみると**案外簡単に見つかります**。
+あまりにも大量にヒットしてしまう場合は差分の表現である `+` や `-` とセットで `+␣␣␣␣/**` などと検索をすることで検索結果を絞ることができます。(`␣` は半角スペースに読み替えてください)
 
-ルールが見つかったあとは**コードを読むことで大体それっぽいことが出来るようになる**と思います。
+お目当てのルールが見つかったあとは**そのルールのコードを読むことで大体それっぽいことが出来るようになる**と思います。
 
 ### よく使うメソッド・クラス
 よく使うメソッドやクラスをパッと思いついた範囲で共有します。
-基本的には**既存のルールのコードを読んでいると便利メソッドをいろいろと発見できます**。
+この他には**既存のルールのコードを読むことで便利なメソッドをいろいろと発見できる**かと思われます。
 
 | クラス | メソッド | 説明 |
 | --- | --- | --- |
 |Rector\Core\Rector\AbstractRector|isName|第一引数の Node の名前が 第二引数の文字列と一致するか判定してくれる。第二引数には正規表現も使える|
 |Rector\Core\Rector\AbstractRector|getName|第一引数に渡した Node の名前を返してくれる|
 |Rector\Core\Rector\AbstractRector|getShortName|FQN を渡すとショートネームを返してくれる|
-|Rector\Core\Rector\AbstractRector|isObjectType|第一引数に渡した Node が第二引数のクラスのインスタンスか判定してくれる(Class\_ など型情報を持つ Node に使う)|
-|PhpParser\NodeAbstract|getAttribute|Rector\NodeTypeResolver\Node\AttributeKey の定数を使うことで色んな情報を Node から取得できる|
+|Rector\Core\Rector\AbstractRector|isObjectType|第一引数に渡した Node が第二引数のクラスとマッチするか判定してくれる(Class\_ など型情報を持つ Node に使う)|
+|PhpParser\NodeAbstract|getAttribute|Rector\NodeTypeResolver\Node\AttributeKey の定数を使うことで様々な情報を Node から取得できる|
 |Rector\Core\PhpParser\Node\BetterNodeFinder|find\*|Node の配列と検索条件を渡すと、検索条件にマッチする Node だけ返してくれる|
 |Rector\Core\Rector\AbstractPHPUnitRector| - |PhpUnit 関連のルールを作るときに便利。今回作ったカスタムルールのテストメソッド判定ルールも、実はこのクラスで既に実装されてる。|
 |Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo|hasByName|引数に渡した文字列にマッチするタグが PhpDoc に含まれているかどうか判定してくれる|
