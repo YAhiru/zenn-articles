@@ -8,10 +8,10 @@ published: false
 
 # はじめに
 
-みなさん、コードの改善はしていますでしょうか。
-コードの改善と一口に言っても様々な性格のものが存在しますが、その中でも**ある一定のルールに基づく機械的な作業**が要求されるものがあるかと思います。
+みなさん, コードの改善はしていますでしょうか。
+コードの改善と一口に言っても様々な性格のものが存在しますが, その中でも**ある一定のルールに基づく機械的な作業**が要求されるものがあるかと思います。
 
-例えば、
+例えば,
 
 - 全ての関数 A を関数 B に変えたい
 - クラス A を継承している全てのクラスの親クラスをクラス B に変えたい
@@ -19,11 +19,11 @@ published: false
 
 などなど……。
 
-小規模なものであれば手作業でおこなっても問題のないことが多いですが、大規模になると**うっかりミスが発生しがち**だったり単純作業ゆえの**精神的な苦痛**が伴うこともあったりなど、あまり好ましくありません。
+小規模なものであれば手作業でおこなっても問題のないことが多いですが, 大規模になると**うっかりミスが発生しがち**だったり単純作業ゆえの**精神的な苦痛**が伴うこともあったりなど, あまり好ましくありません。
 
 本記事で紹介する [Rector](https://github.com/rectorphp/rector) はそういった**機械的な作業からエンジニアを開放する**とてもすごいツールです。
 
-是非本記事で Rector の基本的な使い方を覚え、日々の業務を楽にしてみてください。
+是非本記事で Rector の基本的な使い方を覚え, 日々の業務を楽にしてみてください。
 
 # サンプルプロジェクトの構築
 
@@ -58,21 +58,21 @@ $ cd rector-tutorial
 
 理由は後述しますが **Rector 用のディレクトリとサンプルのアプリケーションコードを分けています**。
 
-ここでいうアプリケーションコードとは Web アプリケーションであればコントローラーやエンティティなどに当たるもので、リファクタリングの対象となるコードです。
+ここでいうアプリケーションコードとは Web アプリケーションであればコントローラーやエンティティなどに当たるもので, リファクタリングの対象となるコードです。
 今回は src ディレクトリに単純なクラスを 1 つだけ用意しています。
 
-rector ディレクトリは本記事の後半で実装する独自ルールのためのディレクトリとなっていますので、最低限の設定のみでほぼ空の状態となっています。
+rector ディレクトリは本記事の後半で実装する独自ルールのためのディレクトリとなっていますので, 最低限の設定のみでほぼ空の状態となっています。
 
 # インストール
 
 Rector は `composer req --dev rector/rector` を実行して利用する他に [phar](https://github.com/rectorphp/rector-prefixed) や [docker](https://hub.docker.com/r/rector/rector) などの形式が用意されています。
-[Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **ルールを自作したいなどのニーズがない場合は phar あるいは docker 形式での利用をおすすめします**。
+[Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため,  **ルールを自作したいなどのニーズがない場合は phar あるいは docker 形式での利用をおすすめします**。
 
-今回は最終的にルールを自作したいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題の発生が予想されます。
+今回は最終的にルールを自作したいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが, 前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題の発生が予想されます。
 そういった場合に有効なのが **Rector 用のサブディレクトリを作成しその中で Rector 関連のコードを完結させること**です。^[[アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!]
 今回のサンプルプロジェクトでもそのアプローチを採用しています。
 
-では、以下のコマンドで Rector のインストールをします。
+では, 以下のコマンドで Rector のインストールをします。
 
 ```bash
 $ cd rector
@@ -103,19 +103,19 @@ final class User
 ```
 
 User クラスのプロパティである `$screenName` や `$age` を見てみると [Typed Property](https://www.php.net/manual/ja/language.oop5.properties.php#language.oop5.properties.typed-properties) が適用されていないことがわかります。
-Typed Property が適用されていない場合 PHP Doc に記述された型以外が代入された場合でもエラーが発生せず、思わぬバグを引き起こす可能性を秘めています。
-あなたの所属するチーム内でこのことが問題視されたという設定で、Rector を使ってこのクラスを自動リファクタリングしてみましょう。
+Typed Property が適用されていない場合 PHP Doc に記述された型以外が代入された場合でもエラーが発生せず, 思わぬバグを引き起こす可能性を秘めています。
+あなたの所属するチーム内でこのことが問題視されたという設定で, Rector を使ってこのクラスを自動リファクタリングしてみましょう。
 
 ## Rector を実行する
 
-Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} --set {{ルールセット}}` のように、 process コマンドに対してターゲットとなるディレクトリや適用したい **ルールセット** や **ルール** を渡せば良いだけです。
+Rector の実行は簡単で `vendor/bin/rector process {{ディレクトリ}} --set {{ルールセット}}` のように,  process コマンドに対してターゲットとなるディレクトリや適用したい **ルールセット** や **ルール** を渡せば良いだけです。
 
 |名前|説明|
 |---|---|
 |ルール|リファクタリングの内容が定義された PHP のクラス|
 |ルールセット|関心ごとが近い複数のルールがまとめられたもの|
 
-今回は Typed Property だけを適用してくれればよいので、 **php74** というルールセットの中にある **Rector\Php74\Rector\Property\TypedPropertyRector** というルールのみを適用したいと思います。
+今回は Typed Property だけを適用してくれればよいので,  **php74** というルールセットの中にある **Rector\Php74\Rector\Property\TypedPropertyRector** というルールのみを適用したいと思います。
 
 **rector ディレクトリ内で**以下のコマンドを実行してみましょう。
 
@@ -127,7 +127,7 @@ $ vendor/bin/rector process ../src \
 
 ## 修正されたファイルを確認する
 
-コマンドを実行するとそれっぽさのある出力がなされたかと思いますが、実際の User クラスを確認してみると以下のように `$screenName` と `$age` に Typed Property が適用されていることがわかります。
+コマンドを実行するとそれっぽさのある出力がなされたかと思いますが, 実際の User クラスを確認してみると以下のように `$screenName` と `$age` に Typed Property が適用されていることがわかります。
 
 ```php:src/User.php
 final class User
@@ -147,7 +147,7 @@ final class User
 
 **どうですか！！！！！！！！すごくないですか！？！？！？！？！？！？！？！？**（唐突な興奮）
 
-Rector を使ってリファクタリングを自動化することで**修正規模によっては工数を大幅に削減することが出来る**ため、あなたの上司もニッコリです。
+Rector を使ってリファクタリングを自動化することで**修正規模によっては工数を大幅に削減することが出来る**ため, あなたの上司もニッコリです。
 
 # ルールの自作
 
@@ -156,12 +156,12 @@ Rector を使ってリファクタリングを自動化することで**修正�
 
 独自のルールを作ることが出来れば**プロダクト固有の要件であってもリファクタリングを自動化**することができます。
 
-今回はあなたの所属するチーム内で「PHPUnit のテストメソッドは、メソッド名に `test` という prefix を付ける形式ではなく `@test` アノテーションを使う形式にしたい」という要望が出たという設定で進めていきましょう。^[あくま記事の都合上の話であり @test アノテーションを推奨しているわけではありません。]
+今回はあなたの所属するチーム内で「PHPUnit のテストメソッドは, メソッド名に `test` という prefix を付ける形式ではなく `@test` アノテーションを使う形式にしたい」という要望が出たという設定で進めていきましょう。^[あくま記事の都合上の話であり @test アノテーションを推奨しているわけではありません。]
 
 ## 独自ルールのテストを書く
 
-早速独自のルールを作っていきたいのですが、まずは**どのようなコードをどのようにリファクタリングしたいのか**ということを明確にする必要があります。
-Rector はテスト基盤も整っていますので、テストを書くことでルールのイメージを固めていきましょう。
+早速独自のルールを作っていきたいのですが, まずは**どのようなコードをどのようにリファクタリングしたいのか**ということを明確にする必要があります。
+Rector はテスト基盤も整っていますので, テストを書くことでルールのイメージを固めていきましょう。
 
 ルールのテストでは必要なものが 2 つあります。
 
@@ -171,7 +171,7 @@ Rector はテスト基盤も整っていますので、テストを書くこと�
 ### テストクラス
 
 ここでいうテストクラスとは `PHPUnit\Framework\TestCase` を継承した任意のクラスのことです。
-Rector には `PHPUnit\Framework\TestCase` を拡張した `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` ^[継承関係には `Symplify\PackageBuilder\Tests\AbstractKernelTestCase` なども含まれていますが本筋から逸れるためスキップしています。] が用意されており、これによって**ルールのテストがとても簡単になる**ため今回はこれを利用します。
+Rector には `PHPUnit\Framework\TestCase` を拡張した `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` ^[継承関係には `Symplify\PackageBuilder\Tests\AbstractKernelTestCase` なども含まれていますが本筋から逸れるためスキップしています。] が用意されており, これによって**ルールのテストがとても簡単になる**ため今回はこれを利用します。
 
 **rector ディレクトリ内**で以下のコマンドを実行してテストクラス用のファイルを作成します。
 
@@ -180,7 +180,7 @@ $ mkdir -p tests/AddTestAnnotationRector
 $ touch tests/AddTestAnnotationRector/AddTestAnnotationRectorTest.php
 ```
 
-ファイルが作成されたら、ファイルに以下の内容を書き込みます。
+ファイルが作成されたら, ファイルに以下の内容を書き込みます。
 
 ```php:rector/tests/AddTestAnnotationRector/AddTestAnnotationRectorTest.php
 <?php
@@ -227,9 +227,9 @@ final class AddTestAnnotationRectorTest extends AbstractRectorTestCase
 ```
 
 ここで返却したルールを `Rector\Core\Testing\PHPUnit\AbstractRectorTestCase` 内でよしなに扱ってくれます。
-`AddTestAnnotationRector` クラスはまだ存在していませんが、テストを実装した後に作成する予定です。
+`AddTestAnnotationRector` クラスはまだ存在していませんが, テストを実装した後に作成する予定です。
 
-`provideData()` はこの後作成する予定の Fixture ファイルを読み込み、 `test()` は読み込まれた Fixture を利用してテストを実行します。
+`provideData()` はこの後作成する予定の Fixture ファイルを読み込み,  `test()` は読み込まれた Fixture を利用してテストを実行します。
 
 ```php:rector/tests/AddTestAnnotationRector/AddTestAnnotationRectorTest.php
     /**
@@ -251,7 +251,7 @@ final class AddTestAnnotationRectorTest extends AbstractRectorTestCase
 
 ### Fixture
 
-Fixture とは、以下のフォーマットで **リファクタリング前のコード** と **リファクタリング後のコード** が記述されたファイルのことです。
+Fixture とは, 以下のフォーマットで **リファクタリング前のコード** と **リファクタリング後のコード** が記述されたファイルのことです。
 
 ```
 <?php
@@ -263,7 +263,7 @@ Fixture とは、以下のフォーマットで **リファクタリング前の
 ?>
 ```
 
-実際の Fixture を見た方が理解が早いので、早速 Fixture を作ってみましょう。
+実際の Fixture を見た方が理解が早いので, 早速 Fixture を作ってみましょう。
 **rector ディレクトリ内**で以下のコマンドを実行してファイルを作成します。
 
 ```bash:rector/
@@ -271,7 +271,7 @@ $ mkdir -p tests/AddTestAnnotationRector/Fixture
 $ touch tests/AddTestAnnotationRector/Fixture/fixture.php.inc
 ```
 
-今回は `test` という prefix がついているテストメソッドを `@test` アノテーション形式に変換するというのが要件ですので、作成したファイルに以下の内容を書き込みます。
+今回は `test` という prefix がついているテストメソッドを `@test` アノテーション形式に変換するというのが要件ですので, 作成したファイルに以下の内容を書き込みます。
 
 ```php:rector/tests/AddTestAnnotationRector/Fixture/fixture.php.inc
 <?php
@@ -305,9 +305,9 @@ class SomeTest extends \PHPUnit\Framework\TestCase
 ```
 
 書き込んだ内容が前述のフォーマット通りになっていることを確認してください。
-また、使用しているエディターによっては上記のコードをコピペした際にリファクタリング前と後の区切りを表す `-----` の直前にスペースが入り込むことがあるので注意してください。
+また, 使用しているエディターによっては上記のコードをコピペした際にリファクタリング前と後の区切りを表す `-----` の直前にスペースが入り込むことがあるので注意してください。
 
-また、作成した Fixture の差分は以下の通りです。
+また, 作成した Fixture の差分は以下の通りです。
 テストメソッドが `@test` アノテーション形式に変わっています。
 
 ```diff
@@ -323,23 +323,23 @@ class SomeTest extends \PHPUnit\Framework\TestCase
 
 #### 注意点
 
-Fixture を作成する上での重要な注意点ですが、 Rector は**リファクタリング対象のコードを動的に読み込みます**。
+Fixture を作成する上での重要な注意点ですが,  Rector は**リファクタリング対象のコードを動的に読み込みます**。
 
-つまり今作成した **Fixture に定義されているクラスも読み込まれる**ということなので、 Fixture にうっかり namespace を書き忘れてしまうと、他のテストの Fixture や既存クラスと**クラス名が衝突する可能性が増します**。
+つまり今作成した **Fixture に定義されているクラスも読み込まれる**ということなので,  Fixture にうっかり namespace を書き忘れてしまうと, 他のテストの Fixture や既存クラスと**クラス名が衝突する可能性が増します**。
 
 なので絶対に **Fixture には namespace を書くように**しましょう。
 
 #### Fixture を複数用意する
 
-テストの準備自体はこれで完了ですが、テスト項目が足りていないのでもう少し Fixture を増やしたいと思います。
+テストの準備自体はこれで完了ですが, テスト項目が足りていないのでもう少し Fixture を増やしたいと思います。
 
-今回の独自ルールにおいて、メソッドがリファクタリング対象であると判断する基準は以下とします。
+今回の独自ルールにおいて, メソッドがリファクタリング対象であると判断する基準は以下とします。
 
 1. クラスが `PHPUnit\Framework\TestCase` を継承していること
 1. メソッド名が `test` で始まっていること
 1. メソッドの可視性が public であること
 
-正常系は先ほどの Fixture でテストできているので、次は上記の条件以外ではリファクタリングされないことを保証する Fixture を追加します。
+正常系は先ほどの Fixture でテストできているので, 次は上記の条件以外ではリファクタリングされないことを保証する Fixture を追加します。
 
 **rector ディレクトリ内**で以下のコマンドを実行してファイルを作成してください。
 
@@ -347,7 +347,7 @@ Fixture を作成する上での重要な注意点ですが、 Rector は**リ�
 $ touch tests/AddTestAnnotationRector/Fixture/{no-test-prefix.php.inc,not-public-method.php.inc,not-test-class.php.inc}
 ```
 
-コードの変更がない場合の Fixture は**リファクタリング後のコードを省くことが可能**ですので、それぞれのファイルに以下の内容を書き込みんでください。
+コードの変更がない場合の Fixture は**リファクタリング後のコードを省くことが可能**ですので, それぞれのファイルに以下の内容を書き込みんでください。
 
 ```php:rector/tests/AddTestAnnotationRector/Fixture/no-test-prefix.php.inc
 <?php
@@ -390,7 +390,7 @@ class NotTest
 ```
 
 Fixture の準備はこれで完了です。
-蛇足ですが、テストしたい内容を明確にするために **Fixture は適切な粒度で分ける**ことを意識すると良いでしょう。
+蛇足ですが, テストしたい内容を明確にするために **Fixture は適切な粒度で分ける**ことを意識すると良いでしょう。
 
 ## 独自ルールを作る
 
@@ -531,7 +531,7 @@ final class AddTestAnnotationRector extends AbstractRector
     }
 ```
 
-独自ルールにおいて `getDefinition` に正確な内容を記述することは必須ではないですが、ルールの利用者が**ルールの性質を理解する手助けとなる**ので書いておいて損はないでしょう。
+独自ルールにおいて `getDefinition` に正確な内容を記述することは必須ではないですが, ルールの利用者が**ルールの性質を理解する手助けとなる**ので書いておいて損はないでしょう。
 
 #### getNodeTypes
 
@@ -553,7 +553,7 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
 
 `refactor()` はルールの核となるメソッドです。
 このメソッドに渡された **`$node` を書き換えることでその内容がファイルに反映されます**。
-また、**スキップする場合は null を返却**します。
+また, **スキップする場合は null を返却**します。
 
 ```php:rector/src/AddTestAnnotationRector.php
     /**
@@ -571,9 +571,9 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
     }
 ```
 
-今回は `getDefinition()` で `PhpParser\Node\Stmt\ClassMethod` のみを指定しているため、 Rector によって `refactor()` には **`PhpParser\Node\Stmt\ClassMethod` のインスタンスのみが渡される**ことが保証されています。
+今回は `getDefinition()` で `PhpParser\Node\Stmt\ClassMethod` のみを指定しているため,  Rector によって `refactor()` には **`PhpParser\Node\Stmt\ClassMethod` のインスタンスのみが渡される**ことが保証されています。
 
-なので PHPDoc は`@param PhpParser\Node\Stmt\ClassMethod $node`とし、 `$node` は `PhpParser\Node\Stmt\ClassMethod` のインスタンスであることを前提にロジックを組み立てて構いません。
+なので PHPDoc は`@param PhpParser\Node\Stmt\ClassMethod $node`とし,  `$node` は `PhpParser\Node\Stmt\ClassMethod` のインスタンスであることを前提にロジックを組み立てて構いません。
 
 ```php:rector/src/AddTestAnnotationRector.php
     public function refactor(Node $node) : ?Node
@@ -585,7 +585,7 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
     }
 ```
 
-クラスメソッドであれば何でもリファクタリングしていいというわけではないので、 `refactor()` の最初にブロック文を実装しています。
+クラスメソッドであれば何でもリファクタリングしていいというわけではないので,  `refactor()` の最初にブロック文を実装しています。
 
 ```php:rector/src/AddTestAnnotationRector.php
     public function refactor(Node $node) : ?Node
@@ -611,7 +611,7 @@ Node の一覧は[こちら](https://github.com/rectorphp/rector/blob/master/doc
             && $this->isObjectType($class, TestCase::class);
     }
 ```
-`shouldRefactor()` はリファクタリングをすべきかどうかを判断するために実装したメソッドで、 **`AddTestAnnotationRector` クラス固有のもの**です。
+`shouldRefactor()` はリファクタリングをすべきかどうかを判断するために実装したメソッドで,  **`AddTestAnnotationRector` クラス固有のもの**です。
 
 ブロック文を抜けたらコードの修正に相当するロジックを実行し `$node` に変更を加えます。
 
@@ -649,10 +649,10 @@ if ($phpDocInfo === null) {
 $phpDocInfo->addBareTag('@test'); // PHP Doc に `@test` タグを追加する
 ```
 
-次に `$this->getName($node)` で取得した**メソッド名から新しいメソッド名を生成**し、設定し直しています。
+次に `$this->getName($node)` で取得した**メソッド名から新しいメソッド名を生成**し, 設定し直しています。
 
 ```php:rector/src/AddTestAnnotationRector.php
-// 元のメソッド名から `test` prefix を削除し、1文字目を小文字に変更した文字列
+// 元のメソッド名から `test` prefix を削除し, 1文字目を小文字に変更した文字列
 $testName = \lcfirst(
     (string) \preg_replace('/\Atest/', '', (string) $this->getName($node))
 );
@@ -682,7 +682,7 @@ $ composer test
 
 # 独自ルールを実行する
 
-自作したルールを実行するためには、コンフィグから **Rector にルールを登録する**必要があります。
+自作したルールを実行するためには, コンフィグから **Rector にルールを登録する**必要があります。
 
 **rector ディレクトリ内**で以下のコマンドを実行してコンフィグファイルを作成してください。
 
@@ -690,7 +690,7 @@ $ composer test
 $ vendor/bin/rector init
 ```
 
-`rector.php` というファイルが rector ディレクトリに作成されたかと思うので、作成されたファイルを以下の内容で書き換えてください。
+`rector.php` というファイルが rector ディレクトリに作成されたかと思うので, 作成されたファイルを以下の内容で書き換えてください。
 
 ```php:rector/rector.php
 <?php
@@ -705,16 +705,16 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
 };
 ```
 
-`ContainerConfigurator` についての詳しい使い方は [Symfony のドキュメント](https://symfony.com/doc/current/service_container.html) を参照していただければと思いますが、 `$services->set()` の部分でルールを Rector に登録しています。
+`ContainerConfigurator` についての詳しい使い方は [Symfony のドキュメント](https://symfony.com/doc/current/service_container.html) を参照していただければと思いますが,  `$services->set()` の部分でルールを Rector に登録しています。
 
 config の作成が完了したら以下のコマンドで Rector を実行します。
-**config ファイルで登録されたルールはオプションで渡さなくても有効になる**ので、引数はディレクトリの指定のみで OK です。
+**config ファイルで登録されたルールはオプションで渡さなくても有効になる**ので, 引数はディレクトリの指定のみで OK です。
 
 ```bash:rector/
 $ vendor/bin/rector process ../tests
 ```
 
-それっぽさのある出力がなされたかと思いますが、実際に変更されたファイルを見てみましょう。
+それっぽさのある出力がなされたかと思いますが, 実際に変更されたファイルを見てみましょう。
 `tests/UserTest.php` に以下のような差分が発生していれば成功です!
 
 ```diff:tests/UserTest.php
@@ -740,14 +740,14 @@ $ vendor/bin/rector process ../tests
 
 # Next Step
 
-駆け足でいろいろと解説しましたが、**意外と簡単そうだな**という感想を抱いた方も多いのではないでしょうか。
-ここまでの知識で**自力でルールを作ることも可能**になっているかと思われますので、是非次はご自身でルールを自作してみてください。
+駆け足でいろいろと解説しましたが, **意外と簡単そうだな**という感想を抱いた方も多いのではないでしょうか。
+ここまでの知識で**自力でルールを作ることも可能**になっているかと思われますので, 是非次はご自身でルールを自作してみてください。
 きっとより理解を深めることが出来ると思います!!
 
-...とはいえ、そんなに都合よく作りたいルールがあるとは限りませんよね。
+...とはいえ, そんなに都合よく作りたいルールがあるとは限りませんよね。
 その場合は今回作成したルールをさらに改善してみてください。
 
-実は本記事で作成したルールは、現状の実装のままでは**あまり好ましくない挙動をするケース**があります。
+実は本記事で作成したルールは, 現状の実装のままでは**あまり好ましくない挙動をするケース**があります。
 たとえば以下のようなテストメソッドの場合です。
 ```php
 /**
@@ -760,24 +760,24 @@ public function testFoo() : void
 ```
 
 このようなテストメソッドに今回作成したルールを適用すると PHP Doc に `@test` アノテーションが**重複して書き込まれてしまいます**。
-なので、既に `@test` アノテーションがある場合は PHP Doc に変更を加えないような修正をしてみましょう。
+なので, 既に `@test` アノテーションがある場合は PHP Doc に変更を加えないような修正をしてみましょう。
 
 ## 独自ルールを作る際のコツ
 
-本記事では最低限の説明になってしまっているので、実際にルールを自作するとなると戸惑ってしまうことも多いかと思います。
+本記事では最低限の説明になってしまっているので, 実際にルールを自作するとなると戸惑ってしまうことも多いかと思います。
 しかも Rector のドキュメントは**ルールを自作するための情報が少なめ**のためドキュメントに頼ることもできません。^[[これ](https://github.com/rectorphp/rector/blob/master/docs/create_own_rule.md)しかない]
 
-そこで、ルールを自作するときに知っていると便利なことをいくつか共有したいと思います。
+そこで, ルールを自作するときに知っていると便利なことをいくつか共有したいと思います。
 
 ### やりたい内容に近いことを行っているルールを探す
 
 ドキュメントがあまりないので**最良の教材は既存ルールのコード**ということになります。
-幸い Rector には**600を超えるルールが既に実装されている**ので、**ドキュメントがなくとも何とかなります**。
+幸い Rector には**600を超えるルールが既に実装されている**ので, **ドキュメントがなくとも何とかなります**。
 
-探し方としては、[ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md) からページ内検索をするのが早いと思います。
-ルール一覧には**リファクタリング前後の差分が PHP コードとして掲載されている**ので、それを手掛かりにすると簡単に見つけることができます。
+探し方としては, [ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md) からページ内検索をするのが早いと思います。
+ルール一覧には**リファクタリング前後の差分が PHP コードとして掲載されている**ので, それを手掛かりにすると簡単に見つけることができます。
 
-たとえば PHP Doc 関連のリファクタリングがしたい場合は、上記のページから**ページ内検索**で `/**` のような PHP Doc っぽい文字列で検索してみると**案外簡単に見つかります**。
+たとえば PHP Doc 関連のリファクタリングがしたい場合は, 上記のページから**ページ内検索**で `/**` のような PHP Doc っぽい文字列で検索してみると**案外簡単に見つかります**。
 あまりにも大量にヒットしてしまう場合は差分の表現である `+` や `-` とセットで `+␣␣␣␣/**` などと検索をすることで検索結果を絞ることができます。(`␣` は半角スペースに読み替えてください)
 
 お目当てのルールが見つかったあとは**そのルールのコードを読むことで大体それっぽいことが出来るようになる**と思います。
@@ -793,7 +793,7 @@ public function testFoo() : void
 |Rector\Core\Rector\AbstractRector|getShortName|FQN を渡すとショートネームを返してくれる|
 |Rector\Core\Rector\AbstractRector|isObjectType|第一引数に渡した Node が第二引数のクラスとマッチするか判定してくれる(Class\_ など型情報を持つ Node に使う)|
 |PhpParser\NodeAbstract|getAttribute|Rector\NodeTypeResolver\Node\AttributeKey の定数を使うことで様々な情報を Node から取得できる|
-|Rector\Core\PhpParser\Node\BetterNodeFinder|find\*|Node の配列と検索条件を渡すと、検索条件にマッチする Node だけ返してくれる|
+|Rector\Core\PhpParser\Node\BetterNodeFinder|find\*|Node の配列と検索条件を渡すと, 検索条件にマッチする Node だけ返してくれる|
 |Rector\Core\Rector\AbstractPHPUnitRector| - |PhpUnit 関連のルールを作るときに便利。今回作ったルールのテストメソッドの判定ルールも実はこのクラスで既に実装されてる。|
 |Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo|hasByName|引数に渡した文字列にマッチするタグが PhpDoc に含まれているかどうか判定してくれる|
 |Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo|getTagsByName|引数に渡した文字列にマッチするタグを取得する|
