@@ -50,8 +50,8 @@ $ cd rector-tutorial
 ```
 .
 ├── rector    # Rector 用のディレクトリ
-│   ├── src   # 記事の終盤で作成するカスタムルール用のディレクトリ
-│   └── tests # カスタムルールのテストディレクトリ
+│   ├── src   # 記事の終盤で作成する独自ルール用のディレクトリ
+│   └── tests # 独自ルールのテストディレクトリ
 ├── src       # サンプルのアプリケーションコードディレクトリ
 └── tests     # サンプルのアプリケーションコードのテストディレクトリ
 ```
@@ -61,14 +61,14 @@ $ cd rector-tutorial
 ここでいうアプリケーションコードとは Web アプリケーションであればコントローラーやエンティティなどに当たるもので、リファクタリングの対象となるコードです。
 今回は src ディレクトリに単純なクラスを 1 つだけ用意しています。
 
-rector ディレクトリはこの記事の後半で実装するカスタムルールのためのディレクトリとなっていますので、最低限の設定のみでほぼ空の状態となっています。
+rector ディレクトリはこの記事の後半で実装する独自ルールのためのディレクトリとなっていますので、最低限の設定のみでほぼ空の状態となっています。
 
 # インストール
 
 Rector は `composer req --dev rector/rector` を実行して利用する他に [phar](https://github.com/rectorphp/rector-prefixed) や [docker](https://hub.docker.com/r/rector/rector) などの形式が用意されています。
-[Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **カスタムルールを作りたいなどのニーズがない場合は phar あるいは docker 形式での利用をおすすめします**。
+[Rector の依存関係](https://github.com/rectorphp/rector/blob/master/composer.json#L27) を確認するとわかる通り依存するライブラリが非常に多いため、 **ルールを自作したいなどのニーズがない場合は phar あるいは docker 形式での利用をおすすめします**。
 
-今回は最終的にカスタムルールを作りたいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題の発生が予想されます。
+今回は最終的にルールを自作したいため [rector/rector](https://github.com/rectorphp/rector) を composer 経由でダウンロードするわけですが、前述の通り依存関係が多いため**既存のプロダクトにインストールすることができない**といった問題の発生が予想されます。
 そういった場合に有効なのが **Rector 用のサブディレクトリを作成しその中で Rector 関連のコードを完結させること**です。^[[アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!]
 今回のサンプルプロジェクトでもそのアプローチを採用しています。
 
@@ -149,26 +149,18 @@ final class User
 
 Rector を使ってリファクタリングを自動化することで**修正規模によっては工数を大幅に削減することが出来る**ため、あなたの上司もニッコリです。
 
-## その他のルールの紹介
-
-今回使ったルールの他に、Rector には 600 個を超える様々なルールが用意されています。あなたのプロダクトで使えそうなルールがないか探してみてください。
-
-- [ルールセットの一覧](https://github.com/rectorphp/rector/tree/master/config/set)
-- [ルール一覧](https://github.com/rectorphp/rector/blob/master/docs/rector_rules_overview.md)
-
-# カスタムルール
+# ルールの自作
 
 リファクタリングの要件はプロダクトによって様々なので Rector が用意してくれているルールだけでは**要件を満たせない**ことがあります。
-そういった場合に有効なのがカスタムルールです。
+そういった場合に有効なのがルールの自作です。
 
-カスタムルールとはつまり **Rector が用意してくれているようなルールを自分で作ってしまおう**という話です。
-カスタムルールを作ることが出来れば**プロダクト固有の要件であってもリファクタリングを自動化**することができます。
+独自のルールを作ることが出来れば**プロダクト固有の要件であってもリファクタリングを自動化**することができます。
 
 今回はあなたの所属するチーム内で「PHPUnit のテストメソッドは、メソッド名に `test` という prefix を付ける形式ではなく `@test` アノテーションを使う形式にしたい」という要望が出たという設定で進めていきましょう。^[あくま記事の都合上の話であり @test アノテーションを推奨しているわけではありません。]
 
-## カスタムルールのテストを書く
+## 独自ルールのテストを書く
 
-早速カスタムルールを作っていきたいのですが、まずは**どのようなコードをどのようにリファクタリングしたいのか**ということを明確にする必要があります。
+早速独自のルールを作っていきたいのですが、まずは**どのようなコードをどのようにリファクタリングしたいのか**ということを明確にする必要があります。
 Rector はテスト基盤も整っていますので、テストを書くことでルールのイメージを固めていきましょう。
 
 ルールのテストでは必要なものが 2 つあります。
@@ -341,7 +333,7 @@ Fixture を作成する上での重要な注意点ですが、 Rector は**リ�
 
 テストの準備自体はこれで完了ですが、テスト項目が足りていないのでもう少し Fixture を増やしたいと思います。
 
-今回のルールにおいて、メソッドがリファクタリング対象であると判断する基準は以下とします。
+今回の独自ルールにおいて、メソッドがリファクタリング対象であると判断する基準は以下とします。
 
 1. クラスが `PHPUnit\Framework\TestCase` を継承していること
 1. メソッド名が `test` で始まっていること
@@ -400,9 +392,9 @@ class NotTest
 Fixture の準備はこれで完了です。
 蛇足ですが、テストしたい内容を明確にするために **Fixture は適切な粒度で分ける**ことを意識すると良いでしょう。
 
-## カスタムルールを作る
+## 独自ルールを作る
 
-次はカスタムルールを作成します。
+次は独自ルールを作成します。
 ルールは基本的に `Rector\Core\Rector\AbstractRector` を継承して作成します。
 
 **rector ディレクトリ内**で以下のコマンドを実行してファイルを作成してください。
@@ -539,7 +531,7 @@ final class AddTestAnnotationRector extends AbstractRector
     }
 ```
 
-カスタムルールにおいて `getDefinition` に正確な内容を記述することは必須ではないですが、ルールの利用者が**ルールの性質を理解する手助けとなる**ので書いておいて損はないでしょう。
+独自ルールにおいて `getDefinition` に正確な内容を記述することは必須ではないですが、ルールの利用者が**ルールの性質を理解する手助けとなる**ので書いておいて損はないでしょう。
 
 #### getNodeTypes
 
@@ -688,7 +680,7 @@ $ composer test
 エラーが発生していなければ OK です。
 テストが落ちた場合は Fixture の内容が記事の内容と一致しているか改めて確認してください。
 
-# カスタムルールを実行する
+# 独自ルールを実行する
 
 自作したルールを実行するためには、コンフィグから **Rector にルールを登録する**必要があります。
 
@@ -749,12 +741,13 @@ $ vendor/bin/rector process ../tests
 # Next Step
 
 駆け足でいろいろと解説しましたが、**意外と簡単そうだな**という感想を抱いた方も多いのではないでしょうか。
+ここまでの知識で**自力でルールを作ることも可能**になっているかと思われますので、是非次はご自身でルールを自作してみてください。
 きっとより理解を深めることが出来ると思います!!
 
-...とはいえ、そんなに都合よく作りたいカスタムルールがあるとは限りませんよね。
-その場合は今回作成したカスタムルールをさらに改善してみてください。
+...とはいえ、そんなに都合よく作りたいルールがあるとは限りませんよね。
+その場合は今回作成したルールをさらに改善してみてください。
 
-実はこの記事で作成したカスタムルールは、現状の実装のままでは**あまり好ましくない挙動をするケース**があります。
+実はこの記事で作成したルールは、現状の実装のままでは**あまり好ましくない挙動をするケース**があります。
 たとえば以下のようなテストメソッドの場合です。
 ```php
 /**
@@ -766,14 +759,15 @@ public function testFoo() : void
 }
 ```
 
+このようなテストメソッドに今回作成したルールを適用すると PHP Doc に `@test` アノテーションが**重複して書き込まれてしまいます**。
 なので、既に `@test` アノテーションがある場合は PHP Doc に変更を加えないような修正をしてみましょう。
 
-## カスタムルールを作る際のコツ
+## 独自ルールを作る際のコツ
 
-この記事では最低限の説明になってしまっているので、実際に自分でルールを作るとなると戸惑ってしまうことも多いかと思います。
-しかも Rector のドキュメントは**カスタムルールを作るための説明が少なめ**なためドキュメントに頼ることもできません。^[[これ](https://github.com/rectorphp/rector/blob/master/docs/create_own_rule.md)しかない]
+この記事では最低限の説明になってしまっているので、実際にルールを自作するとなると戸惑ってしまうことも多いかと思います。
+しかも Rector のドキュメントは**ルールを自作するための情報が少なめ**のためドキュメントに頼ることもできません。^[[これ](https://github.com/rectorphp/rector/blob/master/docs/create_own_rule.md)しかない]
 
-そこで、カスタムルールを作るときに知っていると便利なことをいくつか共有したいと思います。
+そこで、ルールを自作するときに知っていると便利なことをいくつか共有したいと思います。
 
 ### やりたい内容に近いことを行っているルールを探す
 
@@ -800,7 +794,7 @@ public function testFoo() : void
 |Rector\Core\Rector\AbstractRector|isObjectType|第一引数に渡した Node が第二引数のクラスとマッチするか判定してくれる(Class\_ など型情報を持つ Node に使う)|
 |PhpParser\NodeAbstract|getAttribute|Rector\NodeTypeResolver\Node\AttributeKey の定数を使うことで様々な情報を Node から取得できる|
 |Rector\Core\PhpParser\Node\BetterNodeFinder|find\*|Node の配列と検索条件を渡すと、検索条件にマッチする Node だけ返してくれる|
-|Rector\Core\Rector\AbstractPHPUnitRector| - |PhpUnit 関連のルールを作るときに便利。今回作ったカスタムルールのテストメソッド判定ルールも、実はこのクラスで既に実装されてる。|
+|Rector\Core\Rector\AbstractPHPUnitRector| - |PhpUnit 関連のルールを作るときに便利。今回作ったルールのテストメソッドの判定ルールも実はこのクラスで既に実装されてる。|
 |Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo|hasByName|引数に渡した文字列にマッチするタグが PhpDoc に含まれているかどうか判定してくれる|
 |Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo|getTagsByName|引数に渡した文字列にマッチするタグを取得する|
 
@@ -813,7 +807,7 @@ public function testFoo() : void
 - [config のオプション一覧](https://github.com/rectorphp/rector#full-config-configuration)
 - [ルールの設定変更](https://github.com/rectorphp/rector/blob/master/docs/how_to_configure_rules.md)
 - [Service Container](https://symfony.com/doc/current/service_container.html)
-- [自作ルールの作り方](https://github.com/rectorphp/rector/blob/master/docs/create_own_rule.md)
+- [独自ルールの作り方](https://github.com/rectorphp/rector/blob/master/docs/create_own_rule.md)
 - [generate コマンド](https://github.com/rectorphp/rector/blob/master/docs/rector_recipe.md)
 - [Node 一覧](https://github.com/rectorphp/rector/blob/master/docs/nodes_overview.md)
 - [テストについて](https://github.com/rectorphp/rector/blob/master/docs/how_to_add_test_for_rector_rule.md)
