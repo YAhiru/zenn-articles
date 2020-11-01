@@ -819,3 +819,8 @@ public function testFoo() : void
 - [Node 一覧](https://github.com/rectorphp/rector/blob/master/docs/nodes_overview.md)
 - [テストについて](https://github.com/rectorphp/rector/blob/master/docs/how_to_add_test_for_rector_rule.md)
 
+
+# おわりに
+
+Rector はすごい！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+Rector をフル活用してコード改善を楽にしていきましょう！！！！
