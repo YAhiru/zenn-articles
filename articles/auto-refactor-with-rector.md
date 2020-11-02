@@ -72,6 +72,8 @@ Rector は `composer req --dev rector/rector` を実行して利用する他に 
 そういった場合に有効なのが **Rector 用のサブディレクトリを作成しその中で Rector 関連のコードを完結させること**です。^[[アドバイス](https://twitter.com/tadsan/status/1315854532191023104) ありがとうございます!!]
 今回のサンプルプロジェクトでもそのアプローチを採用しています。
 
+また、その他の構成については [こちらの記事](https://zenn.dev/tadsan/articles/c051351286318896b199) も非常に参考になります。
+
 では, 以下のコマンドで Rector のインストールをします。
 
 ```bash
@@ -810,6 +812,7 @@ public function testFoo() : void
 - [generate コマンド](https://github.com/rectorphp/rector/blob/master/docs/rector_recipe.md)
 - [Node 一覧](https://github.com/rectorphp/rector/blob/master/docs/nodes_overview.md)
 - [テストについて](https://github.com/rectorphp/rector/blob/master/docs/how_to_add_test_for_rector_rule.md)
+- [Rector独自ルールのパッケージ運用](https://zenn.dev/tadsan/articles/c051351286318896b199)
 
 
 # おわりに
