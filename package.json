@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "preview": "npx zenn preview",
-    "p": "yarn run preview",
+    "p": "npm run preview",
     "new:article": "npx zenn new:article",
-    "new": "yarn run new:article"
+    "new": "npm run new:article"
   },
   "repository": {
     "type": "git",
