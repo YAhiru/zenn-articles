@@ -3,7 +3,7 @@ title: "JetBrainsのIDEで\\を入力すると直前の文字が消えてしま�
 emoji: "💨"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["IDE", "PhpStorm", "Goland", "IntelliJ", "IDEA"]
-published: false
+published: true
 ---
 
 数ヶ月ほど前から Mac の PhpStorm や Goland で \ を入力すると直前の文字が消えてしまう現象に悩まされていましたが、対処法がわかったので共有します。
