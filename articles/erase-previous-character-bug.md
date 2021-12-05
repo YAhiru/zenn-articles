@@ -1,5 +1,5 @@
 ---
-title: "JetBrainsのIDEで\を入力すると直前の文字が消えてしまう現象の対処法"
+title: "JetBrainsのIDEで\\を入力すると直前の文字が消えてしまう現象の対処法"
 emoji: "💨"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["IDE", "PhpStorm", "Goland", "IntelliJ", "IDEA"]
