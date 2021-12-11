@@ -3,7 +3,7 @@ title: "作りながら学ぶDIコンテナ"
 emoji: "😊"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["PHP", "DIContainer"]
-published: false
+published: true
 ---
 
 この記事は[スターフェスティバル Advent Calendar 2021](https://qiita.com/advent-calendar/2021/stafes)の 12 日目です。
