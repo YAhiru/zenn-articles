@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/YAhiru/zenn-articles#readme",
   "dependencies": {
-    "zenn-cli": "^0.1.134"
+    "zenn-cli": "^0.1.150"
   }
 }
